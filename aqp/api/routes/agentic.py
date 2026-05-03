@@ -24,15 +24,14 @@ from typing import Any
 
 import yaml
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 
-from pydantic import BaseModel, Field
-
 from aqp.api.schemas import (
+    AgentDecisionResponse,
     AgenticBacktestRequest,
     AgenticPipelineRequest,
     AgenticPrecomputeRequest,
-    AgentDecisionResponse,
     DebateTurnResponse,
     TaskAccepted,
 )

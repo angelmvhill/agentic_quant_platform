@@ -12,7 +12,6 @@ from aqp.strategies.analyzingalpha.alphas import (
     UnemploymentMacroOverlayStrategy,
 )
 
-
 __all__ = [
     "ConnorsRSIAlpha",
     "CryptoPriceShearMRAlpha",

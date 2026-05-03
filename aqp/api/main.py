@@ -7,65 +7,11 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from importlib import import_module
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from aqp.api.routes import (
-    agent_specs,
-    agentic,
-    agents,
-    alpha_vantage,
-    analysis_agents,
-    airbyte,
-    auth,
-    backtest,
-    brokers,
-    cfpb,
-    chat,
-    data,
-    data_pipelines,
-    datalinks,
-    datasets,
-    dataset_presets,
-    dbt,
-    entities,
-    factors,
-    fda,
-    feature_catalog,
-    feature_sets,
-    fred,
-    gdelt,
-    health,
-    identifiers,
-    market_data_live,
-    memory,
-    ml,
-    paper,
-    portfolio,
-    rag,
-    registry,
-    research_agents,
-    rl,
-    sec,
-    security,
-    selection_agents,
-    sources,
-    strategies,
-    trader_agents,
-    uspto,
-)
-# Data fabric expansion (Phase 5/6/7) — the new engine, entity registry,
-# Dagster proxy, DataHub sync routers. Imported separately so a hard
-# import error here doesn't take down the existing routes.
-from aqp.api.routes import (  # noqa: E402
-    compute as compute_routes,
-    dagster as dagster_routes,
-    datahub as datahub_routes,
-    engine as engine_routes,
-    entity_registry as entity_registry_routes,
-    fetchers as fetcher_routes,
-)
 from aqp.config import settings
 from aqp.observability import (
     configure_tracing,
@@ -75,6 +21,21 @@ from aqp.observability import (
 from aqp.observability.tracing import instrument_httpx, instrument_redis
 
 logger = logging.getLogger(__name__)
+
+
+def _load_route(name: str):
+    try:
+        return import_module(f"aqp.api.routes.{name}")
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Route module %s disabled: %s", name, exc)
+        return None
+
+
+def _include_route(name: str, *, alias: str | None = None) -> None:
+    module = _load_route(alias or name)
+    router = getattr(module, "router", None) if module is not None else None
+    if router is not None:
+        app.include_router(router)
 
 
 configure_tracing(service_name=f"{settings.otel_service_name}-api")
@@ -116,64 +77,68 @@ app.add_middleware(
 )
 
 # --- Core platform routers -----------------------------------------------
-app.include_router(health.router)
-app.include_router(auth.router)
-app.include_router(chat.router)
-app.include_router(agents.router)
-app.include_router(agentic.router)
-app.include_router(backtest.router)
-app.include_router(rl.router)
-app.include_router(data.router)
-app.include_router(alpha_vantage.router)
-app.include_router(portfolio.router)
-app.include_router(paper.router)
-app.include_router(brokers.router)
-app.include_router(strategies.router)
-app.include_router(registry.router)
-app.include_router(feature_sets.router)
-app.include_router(feature_catalog.router)
-app.include_router(data_pipelines.router)
-app.include_router(datasets.router)
-app.include_router(dbt.router)
-app.include_router(entities.router)
-app.include_router(market_data_live.router)
-app.include_router(factors.router)
-app.include_router(ml.router)
-app.include_router(security.router)
+for _route_name in (
+    "health",
+    "auth",
+    "chat",
+    "agents",
+    "agentic",
+    "backtest",
+    "rl",
+    "data",
+    "alpha_vantage",
+    "portfolio",
+    "paper",
+    "brokers",
+    "strategies",
+    "registry",
+    "feature_sets",
+    "feature_catalog",
+    "data_pipelines",
+    "datasets",
+    "dbt",
+    "entities",
+    "market_data_live",
+    "factors",
+    "ml",
+    "security",
+):
+    _include_route(_route_name)
 
 # --- Data-plane expansion (Phase 5 of the original plan) -----------------
-app.include_router(sources.router)
-app.include_router(identifiers.router)
-app.include_router(datalinks.router)
-app.include_router(fred.router)
-app.include_router(sec.router)
-app.include_router(gdelt.router)
+for _route_name in ("sources", "identifiers", "datalinks", "fred", "sec", "gdelt"):
+    _include_route(_route_name)
 
 # --- Phase 2 of the agentic-RAG expansion: regulatory data adapters ------
-app.include_router(cfpb.router)
-app.include_router(fda.router)
-app.include_router(uspto.router)
+for _route_name in ("cfpb", "fda", "uspto"):
+    _include_route(_route_name)
 
 # --- Phase 6 of the agentic-RAG expansion: spec/team/RAG/memory ---------
-app.include_router(agent_specs.router)
-app.include_router(research_agents.router)
-app.include_router(selection_agents.router)
-app.include_router(trader_agents.router)
-app.include_router(analysis_agents.router)
-app.include_router(rag.router)
-app.include_router(memory.router)
+for _route_name in (
+    "agent_specs",
+    "research_agents",
+    "selection_agents",
+    "trader_agents",
+    "analysis_agents",
+    "rag",
+    "memory",
+):
+    _include_route(_route_name)
 
 # --- Data fabric expansion (Phase 5/6/7 of data-fabric expansion) -------
-app.include_router(engine_routes.router)
-app.include_router(fetcher_routes.router)
-app.include_router(entity_registry_routes.router)
-app.include_router(dagster_routes.router)
-app.include_router(datahub_routes.router)
-app.include_router(compute_routes.router)
-app.include_router(airbyte.router)
+for _route_name in (
+    "engine",
+    "fetchers",
+    "entity_registry",
+    "dagster",
+    "datahub",
+    "compute",
+    "airbyte",
+):
+    _include_route(_route_name)
 
 # --- Inspiration rehydration: dataset presets library ------------------
-app.include_router(dataset_presets.router)
+_include_route("dataset_presets")
 
 
 # ---------------------------------------------------------------------------

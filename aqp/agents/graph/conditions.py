@@ -6,8 +6,6 @@ that the graph should route to.
 """
 from __future__ import annotations
 
-from typing import Any
-
 from aqp.agents.graph.state import AgentState
 
 

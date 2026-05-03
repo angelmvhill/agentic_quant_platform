@@ -1,8 +1,6 @@
 """Tests for the agent capability runtime (tools / memory / guardrails)."""
 from __future__ import annotations
 
-import time
-
 import pytest
 
 from aqp.agents.capabilities import (

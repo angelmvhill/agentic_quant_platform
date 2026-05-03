@@ -24,7 +24,7 @@ def DebateVisualizer(crew_run_id: str | None) -> None:
         )
         return
 
-    result = use_api(f"/agentic/debates/{crew_run_id}", default=[])
+    result = use_api(f"/agentic/debates/{crew_run_id}", default=[])  # noqa: SH101
     if result.loading:
         solara.Info("Loading debate…", dense=True)
         return

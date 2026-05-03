@@ -1,8 +1,9 @@
 """Tracing helpers for Airbyte control-plane operations."""
 from __future__ import annotations
 
-from contextlib import contextmanager
-from typing import Any, Iterator
+from collections.abc import Iterator
+from contextlib import contextmanager, suppress
+from typing import Any
 
 from aqp.observability.tracing import get_tracer
 
@@ -15,10 +16,8 @@ def airbyte_span(name: str, **attributes: Any) -> Iterator[Any]:
         for key, value in attributes.items():
             if value is None:
                 continue
-            try:
+            with suppress(Exception):
                 span.set_attribute(f"airbyte.{key}", value)
-            except Exception:
-                pass
         yield span
 
 

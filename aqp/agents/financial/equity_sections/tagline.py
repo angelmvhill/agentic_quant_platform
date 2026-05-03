@@ -6,7 +6,6 @@ from typing import Any
 from aqp.agents.financial.equity_sections.section_base import BaseSectionAgent
 from aqp.core.registry import register
 
-
 _SYSTEM = """\
 You are a senior equity analyst writing the front-page tagline for a
 sell-side research note. Produce ONE concise sentence (max 24 words)

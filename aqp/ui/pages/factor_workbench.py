@@ -21,7 +21,6 @@ from aqp.ui.components import (
     EntityTable,
     Heatmap,
     MetricTile,
-    StatsGrid,
     TabPanel,
     TabSpec,
     TaskStreamer,
@@ -291,17 +290,16 @@ def _library(operators: list[dict[str, Any]], on_copy_formula) -> None:
                     columns=["category", "name", "arity", "description"],
                     title=f"{len(operators)} registered",
                 )
-        with solara.Card("Example formulas"):
-            with solara.Column(gap="6px"):
-                for label, expr in EXAMPLE_FORMULAS:
-                    with solara.Row(gap="8px", style={"align-items": "center"}):
-                        solara.Markdown(f"**{label}** — `{expr}`")
-                        solara.Button(
-                            "Try in Lab",
-                            on_click=lambda expr=expr: on_copy_formula(expr),
-                            dense=True,
-                            outlined=True,
-                        )
+        with solara.Card("Example formulas"), solara.Column(gap="6px"):
+            for label, expr in EXAMPLE_FORMULAS:
+                with solara.Row(gap="8px", style={"align-items": "center"}):
+                    solara.Markdown(f"**{label}** — `{expr}`")
+                    solara.Button(
+                        "Try in Lab",
+                        on_click=lambda expr=expr: on_copy_formula(expr),
+                        dense=True,
+                        outlined=True,
+                    )
 
 
 def _to_int(text: str, default: int) -> int:

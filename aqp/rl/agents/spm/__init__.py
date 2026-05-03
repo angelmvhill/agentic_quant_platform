@@ -20,8 +20,14 @@ from aqp.core.registry import tag_class
 with _contextlib.suppress(Exception):  # pragma: no cover
     from aqp.rl.agents.q_family import (
         DoubleQAgent as _DoubleQAgent,
+    )
+    from aqp.rl.agents.q_family import (
         DuelQAgent as _DuelQAgent,
+    )
+    from aqp.rl.agents.q_family import (
         QLearningAgent as _QLearningAgent,
+    )
+    from aqp.rl.agents.q_family import (
         RecurrentQAgent as _RecurrentQAgent,
     )
 
@@ -31,7 +37,11 @@ with _contextlib.suppress(Exception):  # pragma: no cover
 with _contextlib.suppress(Exception):  # pragma: no cover
     from aqp.rl.agents.actor_critic import (
         ActorCriticAgent as _ActorCriticAgent,
+    )
+    from aqp.rl.agents.actor_critic import (
         ActorCriticDuelAgent as _ActorCriticDuelAgent,
+    )
+    from aqp.rl.agents.actor_critic import (
         ActorCriticRecurrentAgent as _ActorCriticRecurrentAgent,
     )
 
@@ -50,7 +60,6 @@ from aqp.rl.agents.spm.agents import (  # noqa: F401  (registers via @register)
     DoubleDuelingDQNAgent,
     PolicyGradientAgent,
 )
-
 
 __all__ = [
     "A3CAgent",

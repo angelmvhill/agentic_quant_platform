@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a backtest run analyst. Input: a backtest_run row + key metrics
 (sharpe, sortino, max_drawdown, total_return, ...). Output JSON:
 

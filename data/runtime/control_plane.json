@@ -11,11 +11,11 @@
     }
   ],
   "provider": {
-    "deep_model": "nemotron-3-nano:latest",
+    "deep_model": "llama3.2:latest",
     "ollama_host": "http://host.docker.internal:11434",
     "provider": "ollama",
     "quick_model": "llama3.2:latest",
-    "updated_at": "2026-04-27T04:28:19.326446+00:00",
+    "updated_at": "2026-05-03T00:55:00.000000+00:00",
     "vllm_base_url": ""
   }
 }

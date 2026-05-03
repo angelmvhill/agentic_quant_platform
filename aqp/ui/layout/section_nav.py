@@ -15,7 +15,7 @@ import solara
 from aqp.ui.theme import PALETTE
 
 if TYPE_CHECKING:  # pragma: no cover
-    from aqp.ui.layout.app_shell import NavSectionSpec
+    pass
 
 
 @solara.component

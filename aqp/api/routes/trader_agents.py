@@ -40,7 +40,6 @@ def emit_signal(req: SignalRequest) -> TaskAccepted:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     # We piggy-back on the same generic helper, but go through the
     # research_tasks wrapper for consistent telemetry.
-    from aqp.tasks.research_tasks import run_universe_selector  # type: ignore[unused-import]
 
     payload = {"vt_symbol": req.vt_symbol, "as_of": req.as_of, "horizon": req.horizon, **req.extras}
     # Synchronous emit by default — signals are short.

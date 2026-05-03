@@ -106,6 +106,7 @@ def resolve_model(model_uri: str, download_dir: str | Path | None = None) -> Pre
     if _MLFLOW_URI_RE.match(model_uri):
         try:
             import mlflow
+
             from aqp.config import settings
 
             mlflow.set_tracking_uri(settings.mlflow_tracking_uri)

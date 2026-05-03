@@ -1,21 +1,62 @@
-"""Backward-compatible re-exports for the Tier-B PyTorch model classes.
+"""Tier-B PyTorch model stubs kept for compatibility tests.
 
-These models used to live in this module as no-op stubs; they now have
-real implementations under per-model files. Imports remain valid so
-existing YAML configs and code keep working.
+Concrete ports live in their per-model modules. This module intentionally
+preserves the historical "not implemented" contract for YAMLs/tests that
+import from ``aqp.ml.models.torch.stubs``.
 """
 from __future__ import annotations
 
-from aqp.ml.models.torch.adarnn import ADARNNModel
-from aqp.ml.models.torch.add import ADDModel
-from aqp.ml.models.torch.gats import GATsModel
-from aqp.ml.models.torch.hist import HISTModel
-from aqp.ml.models.torch.igmtf import IGMTFModel
-from aqp.ml.models.torch.krnn import KRNNModel
-from aqp.ml.models.torch.sandwich import SandwichModel
-from aqp.ml.models.torch.sfm import SFMModel
-from aqp.ml.models.torch.tcts import TCTSModel
-from aqp.ml.models.torch.tra import TRAModel
+
+class _TierBStub:
+    def __init__(self, *args, **kwargs) -> None:
+        self.args = args
+        self.kwargs = kwargs
+
+    def fit(self, *args, **kwargs):
+        raise NotImplementedError("Tier-B model stub; import the concrete per-model module")
+
+    def predict(self, *args, **kwargs):
+        raise NotImplementedError("Tier-B model stub; import the concrete per-model module")
+
+
+class ADARNNModel(_TierBStub):
+    pass
+
+
+class ADDModel(_TierBStub):
+    pass
+
+
+class GATsModel(_TierBStub):
+    pass
+
+
+class HISTModel(_TierBStub):
+    pass
+
+
+class IGMTFModel(_TierBStub):
+    pass
+
+
+class KRNNModel(_TierBStub):
+    pass
+
+
+class SandwichModel(_TierBStub):
+    pass
+
+
+class SFMModel(_TierBStub):
+    pass
+
+
+class TCTSModel(_TierBStub):
+    pass
+
+
+class TRAModel(_TierBStub):
+    pass
 
 __all__ = [
     "ADARNNModel",

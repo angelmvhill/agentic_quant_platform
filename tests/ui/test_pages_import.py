@@ -14,7 +14,6 @@ import warnings
 
 import pytest
 
-
 PAGE_MODULES = [
     "aqp.ui.pages.dashboard_home",
     "aqp.ui.pages.chat",

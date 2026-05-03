@@ -23,7 +23,6 @@ from gymnasium import spaces
 from aqp.core.registry import register
 from aqp.rl.envs.base import load_bars, safe_array
 
-
 _DEFAULT_INDICATORS = ("macd", "rsi_14", "sma_20", "sma_50")
 
 

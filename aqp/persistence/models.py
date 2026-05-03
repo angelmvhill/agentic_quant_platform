@@ -5,8 +5,8 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
-    Boolean,
     JSON,
+    Boolean,
     Column,
     DateTime,
     Float,

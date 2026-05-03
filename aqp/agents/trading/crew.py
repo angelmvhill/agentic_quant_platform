@@ -33,11 +33,8 @@ from aqp.agents.trading.types import (
     AgentDecision,
     AnalystReport,
     DebateTurn,
-    PortfolioDecision,
     Rating5,
-    RiskVerdict,
     TraderAction,
-    TraderPlan,
 )
 from aqp.config import settings
 
@@ -70,7 +67,7 @@ class TraderCrewConfig:
     extras: dict = field(default_factory=dict)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "TraderCrewConfig":
+    def from_dict(cls, data: dict) -> TraderCrewConfig:
         known = {f.name for f in cls.__dataclass_fields__.values()}
         clean = {k: v for k, v in data.items() if k in known}
         extras = {k: v for k, v in data.items() if k not in known}
@@ -78,7 +75,7 @@ class TraderCrewConfig:
         return cls(**clean)
 
     @classmethod
-    def from_preset(cls, preset: str) -> "TraderCrewConfig":
+    def from_preset(cls, preset: str) -> TraderCrewConfig:
         """Load a named preset from ``configs/agents/<preset>.yaml``."""
         path = DEFAULT_PRESET_DIR / f"{preset}.yaml"
         if not path.exists():
@@ -191,7 +188,7 @@ def run_trader_crew(
     if capabilities:
         try:
             from aqp.agents.capabilities import AgentCapabilities
-            from aqp.agents.capability_runtime import CapabilityRuntime, GuardrailViolation
+            from aqp.agents.capability_runtime import CapabilityRuntime
 
             runtime = CapabilityRuntime(AgentCapabilities(**capabilities))
             logger.info(
@@ -202,10 +199,7 @@ def run_trader_crew(
             logger.exception("trader crew: capability runtime init failed; continuing without")
             runtime = None
 
-    if isinstance(as_of, datetime):
-        as_of_iso = as_of.isoformat()
-    else:
-        as_of_iso = str(as_of)
+    as_of_iso = as_of.isoformat() if isinstance(as_of, datetime) else str(as_of)
     as_of_dt = datetime.fromisoformat(as_of_iso) if isinstance(as_of, str) else as_of
 
     provider = cfg.provider or settings.llm_provider

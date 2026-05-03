@@ -4,7 +4,6 @@ import {
   DeleteOutlined,
   PlusOutlined,
   SaveOutlined,
-  ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
   Alert,

@@ -41,6 +41,8 @@ except ImportError as exc:  # pragma: no cover
         'Install with: pip install -e ".[ibkr]"'
     ) from exc
 
+import contextlib
+
 from aqp.config import settings
 from aqp.streaming.ingesters.base import BaseIngester
 from aqp.streaming.kafka_producer import KafkaAvroProducer
@@ -382,10 +384,8 @@ class IBKRIngester(BaseIngester):
                         },
                         channel="scanner",
                     )
-            try:
+            with contextlib.suppress(TimeoutError):
                 await asyncio.wait_for(self._stop_event.wait(), timeout=interval)
-            except asyncio.TimeoutError:
-                pass
 
     async def _run_once(self) -> None:
         await self._connect()

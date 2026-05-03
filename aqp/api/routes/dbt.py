@@ -11,8 +11,8 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from aqp.data.dbt import (
-    DbtExportOptions,
     DbtExporter,
+    DbtExportOptions,
     DbtProjectManager,
     DbtRunnerService,
     artifact_paths,

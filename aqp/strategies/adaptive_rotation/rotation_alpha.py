@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 from aqp.core.interfaces import IAlphaModel

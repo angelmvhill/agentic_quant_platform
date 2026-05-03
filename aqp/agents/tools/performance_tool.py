@@ -30,7 +30,6 @@ class PerformanceWindowTool(BaseTool):
         indicators: list[str] | None = None,
     ) -> str:
         try:
-            import pandas as pd
 
             from aqp.data.bars import get_bars
         except Exception as exc:  # noqa: BLE001

@@ -1,8 +1,7 @@
 """Analysis agent: interpret a single agent step's tool calls + outputs."""
 from __future__ import annotations
 
-from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
-
+from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, ToolRef
 
 SYSTEM = """You are an agent step-analyser. Inputs:
 - step: {kind, name, inputs, output, cost_usd, duration_ms, error?}

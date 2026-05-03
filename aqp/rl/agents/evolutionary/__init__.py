@@ -9,8 +9,8 @@
 from __future__ import annotations
 
 from aqp.rl.agents.evolutionary.es import EvolutionStrategyAgent
-from aqp.rl.agents.evolutionary.novelty import NeuroEvolutionNoveltyAgent
 from aqp.rl.agents.evolutionary.neuro import NeuroEvolutionAgent
+from aqp.rl.agents.evolutionary.novelty import NeuroEvolutionNoveltyAgent
 
 __all__ = [
     "EvolutionStrategyAgent",

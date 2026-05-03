@@ -6,8 +6,6 @@ Used by the analysis-agent team to write actionable suggestions
 """
 from __future__ import annotations
 
-from typing import Any
-
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 

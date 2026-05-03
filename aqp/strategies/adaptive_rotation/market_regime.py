@@ -8,7 +8,7 @@ deterministic z-score baseline that's robust enough for backtests.
 from __future__ import annotations
 
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 import numpy as np
 import pandas as pd

@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from aqp.llm.providers.base import ProviderSpec
 
-
 PROVIDERS: dict[str, ProviderSpec] = {
     "openai": ProviderSpec(
         slug="openai",
@@ -73,7 +72,7 @@ PROVIDERS: dict[str, ProviderSpec] = {
         env_key="",  # Ollama doesn't require an API key
         settings_attr="",
         base_url_attr="ollama_host",
-        default_deep_model="nemotron:latest",
+        default_deep_model="qwen2.5:7b",
         default_quick_model="llama3.2:latest",
         requires_api_key=False,
     ),

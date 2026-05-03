@@ -20,6 +20,7 @@ Safety rails:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import importlib.metadata
 import importlib.util
 import logging
@@ -141,10 +142,8 @@ def _tcp_probe(host: str, port: int, *, timeout: float = _TCP_PROBE_TIMEOUT_S) -
     except (TimeoutError, ConnectionError, OSError):
         return False
     finally:
-        try:
+        with contextlib.suppress(OSError):
             sock.close()
-        except OSError:
-            pass
 
 
 def _ibkr_descriptor() -> VenueInfo:
@@ -465,7 +464,7 @@ async def venue_status(venue: str) -> dict[str, Any]:
         return await _with_adapter(venue, _probe)
     except HTTPException:
         raise
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.warning("status probe timed out for %s", venue)
         return {
             **base,

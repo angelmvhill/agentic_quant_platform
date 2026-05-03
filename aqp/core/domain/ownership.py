@@ -9,7 +9,8 @@ top retail holdings, peer groups). Mirrors OpenBB's ``insider_trading``,
 """
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
+from datetime import date as dateType
+from datetime import datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field

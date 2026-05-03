@@ -30,7 +30,6 @@ from aqp.ui.api_client import delete, post
 from aqp.ui.components import (
     LiveStreamer,
     MetricTile,
-    StatsGrid,
     build_security_figure,
     use_api,
 )
@@ -49,7 +48,6 @@ from aqp.ui.services.security import (
     get_quote,
 )
 from aqp.ui.theme import PALETTE, chip_style
-
 
 # ---------------------------------------------------------------------------
 # Constants & static catalog
@@ -527,56 +525,55 @@ def _filters_card(
     on_unsubscribe,
     active_channel: str,
 ) -> None:
-    with solara.Card("Filters"):
-        with solara.Column(gap="10px"):
-            with solara.Row(gap="10px", style={"flex-wrap": "wrap"}):
-                solara.InputText("Focus symbol", value=symbol, style={"min-width": "160px"})
-                solara.Select(label="Venue", value=venue, values=_VENUES)
-                solara.Select(
-                    label="Bar size",
-                    value=bar_size,
-                    values=[label for label, _ in _BAR_SIZES],
-                )
-                solara.Select(
-                    label="Lookback",
-                    value=lookback,
-                    values=[label for label, _ in _LOOKBACK_OPTIONS],
-                )
-                if venue.value == "ibkr":
-                    solara.Select(
-                        label="What to show",
-                        value=what_to_show,
-                        values=_WHAT_TO_SHOW,
-                    )
-                solara.Switch(label="Regular hours", value=rth)
-
-            with solara.Row(gap="10px", style={"flex-wrap": "wrap", "align-items": "center"}):
-                solara.Markdown(
-                    f"<div style='font-size:11px;color:{PALETTE.text_muted};"
-                    "text-transform:uppercase;letter-spacing:0.08em'>Overlays</div>"
-                )
-                for key, label in _OVERLAY_TOGGLES:
-                    _chip_toggle(label, key, overlays)
-                solara.Markdown(
-                    f"<div style='font-size:11px;color:{PALETTE.text_muted};"
-                    "text-transform:uppercase;letter-spacing:0.08em;margin-left:14px'>Panels</div>"
-                )
-                for key, label in _PANEL_TOGGLES:
-                    _chip_toggle(label, key, panels)
-
+    with solara.Card("Filters"), solara.Column(gap="10px"):
+        with solara.Row(gap="10px", style={"flex-wrap": "wrap"}):
+            solara.InputText("Focus symbol", value=symbol, style={"min-width": "160px"})
+            solara.Select(label="Venue", value=venue, values=_VENUES)
+            solara.Select(
+                label="Bar size",
+                value=bar_size,
+                values=[label for label, _ in _BAR_SIZES],
+            )
+            solara.Select(
+                label="Lookback",
+                value=lookback,
+                values=[label for label, _ in _LOOKBACK_OPTIONS],
+            )
             if venue.value == "ibkr":
-                _render_ibkr_status(ibkr_state)
-
-            with solara.Row(gap="10px", style={"flex-wrap": "wrap"}):
-                solara.InputText(
-                    "Watchlist (comma-separated)",
-                    value=watchlist,
-                    style={"min-width": "240px"},
+                solara.Select(
+                    label="What to show",
+                    value=what_to_show,
+                    values=_WHAT_TO_SHOW,
                 )
-                solara.Button("Subscribe live", on_click=on_subscribe, color="primary")
-                if active_channel:
-                    solara.Button("Unsubscribe", on_click=on_unsubscribe, color="error", outlined=True)
-                solara.Button("Refresh", on_click=on_refresh, outlined=True)
+            solara.Switch(label="Regular hours", value=rth)
+
+        with solara.Row(gap="10px", style={"flex-wrap": "wrap", "align-items": "center"}):
+            solara.Markdown(
+                f"<div style='font-size:11px;color:{PALETTE.text_muted};"
+                "text-transform:uppercase;letter-spacing:0.08em'>Overlays</div>"
+            )
+            for key, label in _OVERLAY_TOGGLES:
+                _chip_toggle(label, key, overlays)
+            solara.Markdown(
+                f"<div style='font-size:11px;color:{PALETTE.text_muted};"
+                "text-transform:uppercase;letter-spacing:0.08em;margin-left:14px'>Panels</div>"
+            )
+            for key, label in _PANEL_TOGGLES:
+                _chip_toggle(label, key, panels)
+
+        if venue.value == "ibkr":
+            _render_ibkr_status(ibkr_state)
+
+        with solara.Row(gap="10px", style={"flex-wrap": "wrap"}):
+            solara.InputText(
+                "Watchlist (comma-separated)",
+                value=watchlist,
+                style={"min-width": "240px"},
+            )
+            solara.Button("Subscribe live", on_click=on_subscribe, color="primary")
+            if active_channel:
+                solara.Button("Unsubscribe", on_click=on_unsubscribe, color="error", outlined=True)
+            solara.Button("Refresh", on_click=on_refresh, outlined=True)
 
 
 def _render_ibkr_status(ibkr_state: IBKRAvailability) -> None:
@@ -892,54 +889,53 @@ def _render_watchlist_tab(
     if not subs:
         solara.Markdown("_No active subscriptions yet. Click **Subscribe live** above to create one._")
         return
-    with solara.Card("Active subscriptions"):
-        with solara.Column(gap="8px"):
-            for sub in subs:
-                cid = str(sub.get("channel_id") or "")
-                venue_name = str(sub.get("venue") or "?")
-                symbols_for_channel = list(sub.get("symbols") or [])
-                symbols_str = ", ".join(symbols_for_channel)
-                is_focused = cid == focused_channel
-                with solara.Row(
-                    gap="8px",
-                    style={
-                        "align-items": "center",
-                        "flex-wrap": "wrap",
-                        "padding": "6px 0",
-                        "border-bottom": "1px solid rgba(148, 163, 184, 0.2)",
-                    },
-                ):
-                    marker = "▶" if is_focused else "•"
-                    solara.Markdown(f"{marker} `{cid}` — **{venue_name}** — {symbols_str or '—'}")
-                    if not is_focused:
-                        solara.Button(
-                            "Focus",
-                            on_click=lambda cid=cid, syms=symbols_for_channel: on_focus(cid, syms),
-                            dense=True,
-                            outlined=True,
-                        )
-                    else:
-                        solara.Button(
-                            "Focused",
-                            dense=True,
-                            outlined=True,
-                            disabled=True,
-                        )
+    with solara.Card("Active subscriptions"), solara.Column(gap="8px"):
+        for sub in subs:
+            cid = str(sub.get("channel_id") or "")
+            venue_name = str(sub.get("venue") or "?")
+            symbols_for_channel = list(sub.get("symbols") or [])
+            symbols_str = ", ".join(symbols_for_channel)
+            is_focused = cid == focused_channel
+            with solara.Row(
+                gap="8px",
+                style={
+                    "align-items": "center",
+                    "flex-wrap": "wrap",
+                    "padding": "6px 0",
+                    "border-bottom": "1px solid rgba(148, 163, 184, 0.2)",
+                },
+            ):
+                marker = "▶" if is_focused else "•"
+                solara.Markdown(f"{marker} `{cid}` — **{venue_name}** — {symbols_str or '—'}")
+                if not is_focused:
                     solara.Button(
-                        "Unsubscribe",
-                        on_click=lambda cid=cid: on_unsubscribe(cid),
+                        "Focus",
+                        on_click=lambda cid=cid, syms=symbols_for_channel: on_focus(cid, syms),
                         dense=True,
                         outlined=True,
-                        color="error",
                     )
-            if len(subs) > 1:
+                else:
+                    solara.Button(
+                        "Focused",
+                        dense=True,
+                        outlined=True,
+                        disabled=True,
+                    )
                 solara.Button(
-                    "Unsubscribe all",
-                    on_click=on_unsubscribe_all,
+                    "Unsubscribe",
+                    on_click=lambda cid=cid: on_unsubscribe(cid),
                     dense=True,
                     outlined=True,
                     color="error",
                 )
+        if len(subs) > 1:
+            solara.Button(
+                "Unsubscribe all",
+                on_click=on_unsubscribe_all,
+                dense=True,
+                outlined=True,
+                color="error",
+            )
     if not focused_channel:
         solara.Markdown("_Select a subscription above to start or resume live streaming tiles._")
         return

@@ -20,9 +20,9 @@ from aqp.persistence.models import (
     Base,
     ChatMessage,
     DataLink,
-    DataSource,
     DatasetCatalog,
     DatasetVersion,
+    DataSource,
     ExperimentPlan,
     Fill,
     FredSeries,
@@ -75,6 +75,13 @@ from aqp.persistence.models_entities import (
     Location,
     Sector,
 )
+from aqp.persistence.models_entity_registry import (
+    EntityAnnotation,
+    EntityDatasetLink,
+    EntityIdentifier,
+    EntityRelation,
+    EntityRow,
+)
 from aqp.persistence.models_events import (
     AnalystEstimate,
     CalendarEventRow,
@@ -105,8 +112,8 @@ from aqp.persistence.models_instruments import (
     InstrumentCfd,
     InstrumentCommodity,
     InstrumentCrypto,
-    InstrumentETF,
     InstrumentEquity,
+    InstrumentETF,
     InstrumentFuture,
     InstrumentFxPair,
     InstrumentIndex,
@@ -142,6 +149,13 @@ from aqp.persistence.models_ownership import (
     SharesFloatSnapshot,
     ShortInterestSnapshot,
 )
+from aqp.persistence.models_pipelines import (
+    DatahubSyncLog,
+    DatasetProfile,
+    FetcherRun,
+    PipelineManifestRow,
+    PipelineRunRow,
+)
 from aqp.persistence.models_rag import (
     RagChunkAudit,
     RagCorpus,
@@ -164,20 +178,6 @@ from aqp.persistence.models_taxonomy import (
     EntityTag,
     TaxonomyNode,
     TaxonomyScheme,
-)
-from aqp.persistence.models_pipelines import (
-    DatahubSyncLog,
-    DatasetProfile,
-    FetcherRun,
-    PipelineManifestRow,
-    PipelineRunRow,
-)
-from aqp.persistence.models_entity_registry import (
-    EntityAnnotation,
-    EntityDatasetLink,
-    EntityIdentifier,
-    EntityRelation,
-    EntityRow,
 )
 
 __all__ = [

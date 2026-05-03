@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dagster import AssetSelection, define_asset_job
 
-
 full_data_refresh_job = define_asset_job(
     name="full_data_refresh_job",
     selection=AssetSelection.groups("aqp_sources"),

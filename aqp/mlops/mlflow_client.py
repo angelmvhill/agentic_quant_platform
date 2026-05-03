@@ -92,7 +92,7 @@ def link_strategy(run_id: str, strategy_id: str) -> None:
     """Attach an ``aqp.strategy_id`` tag to an existing run (for after-the-fact
     wiring when the strategy row is created after the backtest run)."""
     try:
-        mlflow = _client()
+        _client()
         from mlflow.tracking import MlflowClient
 
         MlflowClient(tracking_uri=settings.mlflow_tracking_uri).set_tag(
@@ -331,7 +331,7 @@ def register_and_serve(
     No-op + logs an error when MLflow / the backend is unavailable.
     """
     try:
-        mlflow = _client()
+        _client()
         from mlflow.tracking import MlflowClient
 
         client = MlflowClient(tracking_uri=settings.mlflow_tracking_uri)

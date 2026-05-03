@@ -7,7 +7,6 @@ rows are dropped.
 """
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 from aqp.core.registry import labeling

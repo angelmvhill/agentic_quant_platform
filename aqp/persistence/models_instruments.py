@@ -12,9 +12,8 @@ resolve to the base ``Instrument`` shape — no subclass row is required.
 """
 from __future__ import annotations
 
-from datetime import datetime
-
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     Date,
@@ -22,13 +21,11 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     Text,
 )
 
 from aqp.persistence.models import Instrument
-
 
 # ---------------------------------------------------------------------------
 # Equity family

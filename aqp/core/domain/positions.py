@@ -27,7 +27,6 @@ from aqp.core.domain.identifiers import (
 )
 from aqp.core.domain.money import Money
 
-
 # ---------------------------------------------------------------------------
 # Position base
 # ---------------------------------------------------------------------------

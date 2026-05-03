@@ -12,7 +12,7 @@ from typing import Any
 
 import solara
 
-from aqp.ui.api_client import delete, get, post
+from aqp.ui.api_client import delete, post
 from aqp.ui.components import (
     EntityTable,
     FieldSpec,

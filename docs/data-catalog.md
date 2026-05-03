@@ -129,7 +129,7 @@ Defaults live on `settings` (`AQP_LLM_DIRECTOR_*` env vars):
 | Setting | Default | Purpose |
 | ------- | ------- | ------- |
 | `AQP_LLM_DIRECTOR_PROVIDER` | `ollama` | LLM provider slug |
-| `AQP_LLM_DIRECTOR_MODEL` | `nemotron-3-nano:30b` | Ollama tag |
+| `AQP_LLM_DIRECTOR_MODEL` | `qwen2.5:7b` | Ollama tag |
 | `AQP_LLM_DIRECTOR_TEMPERATURE` | `0.1` | Determinism dial |
 | `AQP_LLM_DIRECTOR_MAX_TOKENS` | `4096` | Output budget |
 | `AQP_LLM_DIRECTOR_ENABLED` | `true` | Master switch |
@@ -150,12 +150,12 @@ at one per dataset.
 flowchart LR
   Path[user path] --> Discover[discover_datasets]
   Discover --> Brief[build JSON brief]
-  Brief --> Director["Nemotron: plan_ingestion (LLM)"]
+  Brief --> Director["Director LLM: plan_ingestion"]
   Director -->|IngestionPlan| Materialize[materialize_dataset per planned table]
   Materialize --> Verify{rows ok?}
-  Verify -->|no| Retry["Nemotron: retry_with (LLM)"]
+  Verify -->|no| Retry["Director LLM: retry_with"]
   Retry --> Materialize
-  Verify -->|yes| Annotate["Nemotron: annotate_table (LLM)"]
+  Verify -->|yes| Annotate["Director LLM: annotate_table"]
   Annotate --> Catalog[(Iceberg on C:/aqp-warehouse)]
 ```
 
@@ -178,7 +178,7 @@ docker exec aqp-api python -m scripts.ingest_regulatory \
 The driver:
 
 1. Probes Ollama (`GET /api/tags`) and pulls
-   `nemotron-3-nano:30b` if missing (skip with `--skip-pull`).
+   `qwen2.5:7b` if missing (skip with `--skip-pull`).
 2. Resolves which of `cfpb / uspto / fda / sec` exist under
    `--host-root` (default `/host-downloads`).
 3. **Spawns one fresh Python subprocess per source** running
@@ -293,7 +293,7 @@ All settings live on `aqp.config.settings` and read from the standard
 | `AQP_ICEBERG_MAX_ROWS_PER_DATASET` | `5000000` | Default row cap; flagged as `truncated` in lineage when hit. |
 | `AQP_ICEBERG_MAX_FILES_PER_DATASET` | `2000` | Per-family file cap. |
 | `AQP_LLM_DIRECTOR_PROVIDER` | `ollama` | LLM provider for plan/verify steps. |
-| `AQP_LLM_DIRECTOR_MODEL` | `nemotron-3-nano:30b` | Model tag for plan/verify. |
+| `AQP_LLM_DIRECTOR_MODEL` | `qwen2.5:7b` | Model tag for plan/verify. |
 | `AQP_LLM_DIRECTOR_TEMPERATURE` | `0.1` | Determinism dial. |
 | `AQP_LLM_DIRECTOR_MAX_TOKENS` | `4096` | Output budget per LLM call. |
 | `AQP_LLM_DIRECTOR_ENABLED` | `true` | Master kill switch. |

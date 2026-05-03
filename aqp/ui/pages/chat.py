@@ -4,7 +4,7 @@ from __future__ import annotations
 import solara
 
 from aqp.ui.api_client import post
-from aqp.ui.components import SplitPane, TaskStreamer, use_api
+from aqp.ui.components import SplitPane, TaskStreamer
 from aqp.ui.components.chat_message import ChatBubble
 from aqp.ui.layout.page_header import PageHeader
 

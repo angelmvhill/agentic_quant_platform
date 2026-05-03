@@ -16,8 +16,8 @@ import pytest
 
 torch = pytest.importorskip("torch", reason="torch is required for SPM forecasters")
 
-from aqp.ml.models.spm.forecasters import LSTMForecaster  # noqa: E402
 from aqp.ml.models.spm._torch_base import TrainConfig  # noqa: E402
+from aqp.ml.models.spm.forecasters import LSTMForecaster  # noqa: E402
 from aqp.ml.walk_forward import SimpleSliceDataset  # noqa: E402
 
 

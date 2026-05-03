@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Iterator
 from typing import Any
 
 from aqp.config import settings

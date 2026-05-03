@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import pytest
-
 from aqp.providers.base import CostTier, Data, Fetcher, QueryParams
 from aqp.providers.catalog import (
     fetcher_catalog,
@@ -93,7 +91,7 @@ def test_query_params_alias_dict():
 def test_data_extra_fields_preserved():
     d = DemoData(symbol="AAPL", value=1.0, provider_specific="extra")
     assert d.symbol == "AAPL"
-    assert getattr(d, "provider_specific") == "extra"
+    assert d.provider_specific == "extra"
 
 
 def test_catalog_register_and_pick():

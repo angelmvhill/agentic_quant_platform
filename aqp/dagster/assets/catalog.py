@@ -5,8 +5,6 @@ from typing import Any
 
 from dagster import AssetExecutionContext, asset
 
-from aqp.dagster.resources import AqpDataHubResource
-
 
 @asset(
     description="Push every AQP dataset_catalogs row to DataHub as a Dataset.",
@@ -14,7 +12,6 @@ from aqp.dagster.resources import AqpDataHubResource
     required_resource_keys={"datahub"},
 )
 def datahub_push_datasets(context: AssetExecutionContext) -> dict[str, Any]:
-    datahub: AqpDataHubResource = context.resources.datahub
 
     try:
         from aqp.data.datahub import sync as datahub_sync

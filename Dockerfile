@@ -64,13 +64,16 @@ CMD ["aqp-stream-ingest", "--venue", "all"]
 
 
 ###############################################################################
-# Stage 3 (default): "api" target — FastAPI gateway + UI-capable runtime with
-# Dash mounted at /dash and full dev extras so the worker / UI containers
-# share this image.
+# Stage 3 (default): "api" target — FastAPI gateway + worker runtime.
+# Installs the runtime extras needed by API + worker Research Agent / RAG flows
+# without pulling the broader serving, Dagster, dbt, Ray, or streaming stacks.
 ###############################################################################
 FROM base AS api
 
-RUN pip install --upgrade pip && pip install -e ".[dev,otel,cli,iceberg]"
+RUN pip install --upgrade pip && pip install --retries 10 --timeout 60 --resume-retries 20 \
+    -e ".[iceberg,regulatory,agents-rag,llm-finance,otel,cli]" \
+    "pytest>=7.4" \
+    "ruff>=0.3"
 
 EXPOSE 8000 8765
 

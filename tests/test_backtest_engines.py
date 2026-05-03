@@ -17,7 +17,7 @@ def single_symbol_bars(synthetic_bars: pd.DataFrame) -> pd.DataFrame:
 
 
 def test_vectorbt_engine_runs(single_symbol_bars: pd.DataFrame) -> None:
-    vbt = pytest.importorskip("vectorbt")
+    pytest.importorskip("vectorbt")
     from aqp.backtest.vectorbt_engine import VectorbtEngine
 
     engine = VectorbtEngine(initial_cash=100_000.0, warmup_bars=30, allow_short=False)

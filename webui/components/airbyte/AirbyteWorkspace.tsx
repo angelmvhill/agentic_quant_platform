@@ -1,6 +1,6 @@
 "use client";
 
-import { App, Button, Card, Col, Form, Input, Row, Select, Space, Statistic, Table, Tag, Typography } from "antd";
+import { App, Button, Card, Col, Form, Input, Row, Select, Space, Statistic, Table, Tag } from "antd";
 import { useMemo, useState } from "react";
 
 import { PageContainer } from "@/components/shell/PageContainer";

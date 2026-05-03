@@ -1,8 +1,6 @@
 """CrewAI tool: cross-source regulatory lookup (CFPB / FDA / USPTO)."""
 from __future__ import annotations
 
-from typing import Any
-
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 

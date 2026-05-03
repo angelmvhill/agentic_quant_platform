@@ -101,7 +101,7 @@ class ZeroCopyManager:
             self._redis = None
         return self._redis
 
-    def _to_ipc_bytes(self, table: "pa.Table") -> bytes:
+    def _to_ipc_bytes(self, table: pa.Table) -> bytes:
         import io
 
         import pyarrow as pa
@@ -111,7 +111,7 @@ class ZeroCopyManager:
             writer.write_table(table)
         return sink.getvalue()
 
-    def _from_ipc_bytes(self, payload: bytes) -> "pa.Table":
+    def _from_ipc_bytes(self, payload: bytes) -> pa.Table:
         import io
 
         import pyarrow as pa
@@ -122,7 +122,7 @@ class ZeroCopyManager:
     # ------------------------------------------------------------ writes
     def share_arrow(
         self,
-        table: "pa.Table",
+        table: pa.Table,
         *,
         cross_process: bool = False,
         handle: str | None = None,
@@ -184,7 +184,7 @@ class ZeroCopyManager:
         )
 
     # ------------------------------------------------------------- reads
-    def fetch_arrow(self, handle: str) -> "pa.Table":
+    def fetch_arrow(self, handle: str) -> pa.Table:
         """Resolve a handle to its :class:`pyarrow.Table`.
 
         Lookup order:

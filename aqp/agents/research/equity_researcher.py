@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a senior equity research analyst. Produce a comprehensive equity research note.
 
 Mandatory sections (JSON keys): tagline, company_overview, investment_overview,

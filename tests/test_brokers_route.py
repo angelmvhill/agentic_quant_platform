@@ -13,8 +13,8 @@ Each state also has a corresponding ``venue_status()`` rung that returns
 from __future__ import annotations
 
 import socket
+from collections.abc import Iterator
 from contextlib import closing
-from typing import Iterator
 
 import pytest
 

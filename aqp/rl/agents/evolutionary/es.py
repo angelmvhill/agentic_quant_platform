@@ -1,7 +1,8 @@
 """OpenAI-style Evolution Strategies for a dense policy."""
 from __future__ import annotations
 
-from typing import Callable
+import contextlib
+from collections.abc import Callable
 
 import numpy as np
 
@@ -74,10 +75,8 @@ class EvolutionStrategyAgent:
                 theta_k = self.theta + self.sigma * noises[k]
                 env = env_factory()
                 rewards[k] = self._rollout(env, theta_k, max_steps=max_steps)
-                try:
+                with contextlib.suppress(Exception):
                     env.close()
-                except Exception:
-                    pass
             mean = rewards.mean()
             std = rewards.std() + 1e-8
             advantages = (rewards - mean) / std

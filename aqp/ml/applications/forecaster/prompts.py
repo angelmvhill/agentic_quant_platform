@@ -1,7 +1,6 @@
 """Prompt templates for the FinGPT-Forecaster."""
 from __future__ import annotations
 
-
 FORECASTER_SYSTEM = """\
 You are FinGPT-Forecaster, a financial analysis AI. You are given the
 target ticker, the as-of date, a batch of recent news headlines, and a

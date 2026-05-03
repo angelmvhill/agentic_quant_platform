@@ -29,7 +29,6 @@ import pyarrow as pa
 from aqp.config import settings
 from aqp.data import iceberg_catalog
 
-
 SMOKE_NAMESPACE = "aqp_smoke"
 SMOKE_TABLE = "smoke_test"
 SMOKE_IDENT = f"{SMOKE_NAMESPACE}.{SMOKE_TABLE}"

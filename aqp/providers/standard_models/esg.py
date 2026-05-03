@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import date as dateType
 from decimal import Decimal
 
-from pydantic import Field, field_validator
+from pydantic import field_validator
 
 from aqp.providers.base import Data, QueryParams
 

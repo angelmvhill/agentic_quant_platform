@@ -1,7 +1,7 @@
 """Tests for the MinVariance / Markowitz portfolio constructors."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import numpy as np
 import pandas as pd

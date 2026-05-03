@@ -17,7 +17,6 @@ from typing import Any
 import pytest
 import reacton
 
-
 FAKE_RESPONSES: dict[str, Any] = {
     "/portfolio/kill_switch": {"engaged": False, "reason": ""},
     "/portfolio/orders?limit=1": [],

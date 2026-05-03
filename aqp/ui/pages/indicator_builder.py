@@ -23,7 +23,6 @@ from aqp.ui.components import (
 )
 from aqp.ui.layout.page_header import PageHeader
 
-
 _CATEGORY_PANEL = {
     "trend": "price",
     "bands": "price",

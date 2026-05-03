@@ -214,10 +214,7 @@ def _to_backtest_result(pf: Any, close: pd.DataFrame, initial_cash: float) -> Ba
         value = pf.value()
     except Exception:
         value = pf.total_value()
-    if isinstance(value, pd.DataFrame):
-        equity = value.sum(axis=1)
-    else:
-        equity = value
+    equity = value.sum(axis=1) if isinstance(value, pd.DataFrame) else value
     equity = equity.astype(float)
     equity.name = "equity"
     equity = equity.sort_index()

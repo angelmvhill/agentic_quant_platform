@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PageContainer } from "@/components/shell/PageContainer";
 import { apiFetch } from "@/lib/api/client";
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 interface RegistryEntry {
   alias: string;

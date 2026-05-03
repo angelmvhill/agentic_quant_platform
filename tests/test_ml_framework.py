@@ -1,8 +1,6 @@
 """Tests for the native aqp.ml framework."""
 from __future__ import annotations
 
-from datetime import datetime
-
 import pandas as pd
 import pytest
 

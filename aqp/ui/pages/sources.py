@@ -11,7 +11,7 @@ from typing import Any
 
 import solara
 
-from aqp.ui.api_client import get, post
+from aqp.ui.api_client import get
 
 
 @solara.component

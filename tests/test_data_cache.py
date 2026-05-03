@@ -13,7 +13,6 @@ import pytest
 
 from aqp.data import cache as cache_mod
 
-
 # --------------------------------------------------------------------------
 # In-memory fake Redis (sync + async dual role)
 # --------------------------------------------------------------------------

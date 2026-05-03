@@ -6,7 +6,6 @@ from typing import Any
 from aqp.agents.financial.equity_sections.section_base import BaseSectionAgent
 from aqp.core.registry import register
 
-
 _SYSTEM = """\
 You are an equity research analyst writing the Competitor Analysis
 section. Compare the focus name against the supplied peer list across:

@@ -23,7 +23,6 @@ from typing import Any
 from aqp.core.domain.enums import IndustryClassificationScheme
 from aqp.core.domain.identifiers import IdentifierScheme, IdentifierSet, IdentifierValue
 
-
 # ---------------------------------------------------------------------------
 # Classification primitives
 # ---------------------------------------------------------------------------

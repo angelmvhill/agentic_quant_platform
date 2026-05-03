@@ -560,9 +560,9 @@ def links_show(vt_symbol: str = typer.Argument(..., help="e.g. AAPL.NASDAQ")) ->
     from aqp.persistence.db import get_session
     from aqp.persistence.models import (
         DataLink,
-        DataSource,
         DatasetCatalog,
         DatasetVersion,
+        DataSource,
         Instrument,
     )
 

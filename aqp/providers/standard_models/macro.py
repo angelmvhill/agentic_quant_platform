@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import date as dateType
-from decimal import Decimal
 
 from pydantic import Field
 

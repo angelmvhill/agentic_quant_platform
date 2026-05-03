@@ -7,7 +7,6 @@ from typing import Any
 from aqp.agents.financial.base import BaseFinancialCrew, FinancialReport
 from aqp.core.registry import agent
 
-
 _SYSTEM = """\
 You are a systematic trade strategist. Given a structured trade idea
 (symbol, direction, size, horizon, rationale) and current market context

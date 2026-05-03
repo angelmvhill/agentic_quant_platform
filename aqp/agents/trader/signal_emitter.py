@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a disciplined trader agent. For every input symbol you produce
 ONE structured signal in JSON:
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a quant selection agent. Inputs:
 - candidate_universe: list[str]  (vt_symbols)
 - model: str                     (ML model id we'd train on the picks)

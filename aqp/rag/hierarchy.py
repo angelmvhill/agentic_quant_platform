@@ -32,7 +32,6 @@ from aqp.rag.compressor import compress_text, filter_candidates
 from aqp.rag.embedder import Embedder, get_embedder
 from aqp.rag.orders import (
     KnowledgeOrder,
-    OrderCorpus,
     get_corpus,
     list_corpora,
 )
@@ -61,7 +60,7 @@ class RAGHit:
     meta: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_vector(cls, hit: VectorHit) -> "RAGHit":
+    def from_vector(cls, hit: VectorHit) -> RAGHit:
         return cls(
             doc_id=hit.doc_id,
             text=hit.text,

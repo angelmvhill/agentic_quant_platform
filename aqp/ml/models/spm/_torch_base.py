@@ -10,7 +10,7 @@ torch unless a TorchForecasterBase descendant is actually constructed.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -88,7 +88,7 @@ class TorchForecasterBase(Model):
     # Standard Model contract
     # ------------------------------------------------------------------
 
-    def fit(self, dataset: Any, reweighter: Reweighter | None = None) -> "TorchForecasterBase":
+    def fit(self, dataset: Any, reweighter: Reweighter | None = None) -> TorchForecasterBase:
         _ensure_torch()
         import torch
         from torch import nn
@@ -177,7 +177,7 @@ class TorchForecasterBase(Model):
     @staticmethod
     def _extract_index(dataset: Any) -> pd.Index | None:
         if hasattr(dataset, "index"):
-            return getattr(dataset, "index")
+            return dataset.index
         if isinstance(dataset, pd.DataFrame | pd.Series):
             return dataset.index
         return None

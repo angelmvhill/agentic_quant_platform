@@ -69,7 +69,7 @@ class EnsembleAgent:
         self.history: dict[str, list[float]] = {}
         self.scores: dict[str, float] = {}
 
-    def train(self, train_env, val_env=None) -> "EnsembleAgent":
+    def train(self, train_env, val_env=None) -> EnsembleAgent:
         """Train every member; pick the best on ``val_env`` (or train if None)."""
         eval_env = val_env or train_env
         for member in self.members:
@@ -104,7 +104,7 @@ class EnsembleAgent:
         self.best.save(path / "best.zip")
 
     @classmethod
-    def load(cls, path: Path | str, algo: str) -> "EnsembleAgent":
+    def load(cls, path: Path | str, algo: str) -> EnsembleAgent:
         agent = cls()
         agent.best = SB3Adapter(algo=algo)
         agent.best.load(Path(path) / "best.zip")

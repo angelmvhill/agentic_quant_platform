@@ -340,7 +340,7 @@ function MonitorPageInner() {
                         {ev.timestamp}
                       </Text>
                       {"direction" in ev ? <Tag>{ev.direction}</Tag> : null}
-                      {"close" in ev ? (
+                      {typeof ev.close === "number" ? (
                         <Text style={{ fontSize: 12 }}>{ev.close.toFixed(2)}</Text>
                       ) : null}
                     </Space>

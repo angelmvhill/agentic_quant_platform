@@ -16,7 +16,7 @@ description: "Long-form equity research synthesis"
 system_prompt: "You are a senior equity research analyst. ..."
 model:
   provider: ollama
-  model: nemotron:latest
+  model: ""
   tier: deep
   temperature: 0.2
 tools: [rag_query, hierarchy_browse, fundamentals_snapshot, news_digest]
@@ -183,13 +183,13 @@ class AgentSpec(BaseModel):
         return self.memory.role or self.name
 
     @classmethod
-    def from_yaml_path(cls, path: str) -> "AgentSpec":
+    def from_yaml_path(cls, path: str) -> AgentSpec:
         with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         return cls.model_validate(data)
 
     @classmethod
-    def from_yaml_str(cls, content: str) -> "AgentSpec":
+    def from_yaml_str(cls, content: str) -> AgentSpec:
         data = yaml.safe_load(content) or {}
         return cls.model_validate(data)
 

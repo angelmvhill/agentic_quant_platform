@@ -170,7 +170,7 @@ class BaseQAgent:
 
     def train_on_env(self, env, episodes: int = 50, max_steps: int | None = None) -> list[float]:
         returns: list[float] = []
-        for ep in range(episodes):
+        for _ep in range(episodes):
             obs, _ = env.reset()
             total = 0.0
             step = 0

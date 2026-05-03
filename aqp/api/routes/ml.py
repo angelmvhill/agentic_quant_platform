@@ -1157,7 +1157,6 @@ def datasets_preview(req: DatasetPreviewRequest) -> dict[str, Any]:
 @router.get("/recipes")
 def list_recipes() -> list[dict[str, Any]]:
     """Enumerate `configs/ml/**/*.yaml` recipes for the training UI."""
-    import os
     from pathlib import Path
 
     import yaml

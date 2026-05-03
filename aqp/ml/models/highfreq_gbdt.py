@@ -55,7 +55,7 @@ class HighFreqGBDT(LGBModel):
             return panel
         return panel[keep]
 
-    def fit(self, dataset: Any, reweighter: Any | None = None) -> "HighFreqGBDT":
+    def fit(self, dataset: Any, reweighter: Any | None = None) -> HighFreqGBDT:
         import lightgbm as lgb
 
         panel = prepare_panel(dataset, "train")

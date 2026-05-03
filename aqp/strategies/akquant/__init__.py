@@ -11,11 +11,10 @@ from aqp.strategies.akquant.alphas import (
     GridTradingStrategy,
     MomentumRotationAlpha,
     SixtyFortyRebalanceStrategy,
-    TPlusOneStrategy,
     TargetWeightsRebalanceStrategy,
     TimerMomentumRotationAlpha,
+    TPlusOneStrategy,
 )
-
 
 __all__ = [
     "AtrBreakoutAlpha",

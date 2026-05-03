@@ -10,9 +10,9 @@ from typing import Any
 
 import pandas as pd
 
-from aqp.core.interfaces import IAlphaModel, IStrategy
+from aqp.core.interfaces import IStrategy
 from aqp.core.registry import register
-from aqp.core.types import BarData, Direction, OrderData, OrderRequest, Signal, Symbol
+from aqp.core.types import BarData, OrderData, OrderRequest
 from aqp.data.indicators_zoo import IndicatorZoo
 from aqp.strategies.qtradex.alphas import BasicAlphaBase
 

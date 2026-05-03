@@ -4,9 +4,9 @@
 
 services:
   redis:
-    image: redis:7-alpine
+    image: redis/redis-stack-server:latest
     container_name: aqp-redis
-    command: redis-server --appendonly yes --notify-keyspace-events KEA
+    command: redis-stack-server --appendonly yes --notify-keyspace-events KEA
     ports:
       - "6379:6379"
     volumes:
@@ -150,6 +150,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: api
     container_name: aqp-api
     command: uvicorn aqp.api.main:app --host 0.0.0.0 --port 8000 --reload
     env_file: .env
@@ -188,7 +189,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-      - "C:/Users/Julian Wiley/Downloads:/host-downloads:ro"
+      - "C:/Users/angel/Downloads:/host-downloads:ro"
       # Persistent Iceberg warehouse + staging on the host drive. Tear
       # down the entire stack and the catalog still survives here.
       # NOTE: original target was D:/aqp-warehouse; moved to C: because
@@ -208,6 +209,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: api
     container_name: aqp-worker
     command: celery -A aqp.tasks.celery_app worker --loglevel=info -Q default,backtest,agents,ingestion,paper --concurrency=4
     env_file: .env
@@ -237,7 +239,7 @@ services:
       XDG_DATA_HOME: /app/data/xdg
     volumes:
       - .:/app
-      - "C:/Users/Julian Wiley/Downloads:/host-downloads:ro"
+      - "C:/Users/angel/Downloads:/host-downloads:ro"
       - "C:/aqp-warehouse:/warehouse"
     depends_on:
       redis:
@@ -253,6 +255,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: api
     container_name: aqp-worker-gpu
     command: celery -A aqp.tasks.celery_app worker --loglevel=info -Q training --concurrency=1
     env_file: .env
@@ -287,6 +290,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: api
     container_name: aqp-beat
     command: celery -A aqp.tasks.celery_app beat --loglevel=info
     env_file: .env
@@ -360,7 +364,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: paper
+      target: api
     container_name: aqp-paper-trader
     command: aqp paper run --config /app/configs/paper/alpaca_mean_rev.yaml --dry-run
     env_file: .env

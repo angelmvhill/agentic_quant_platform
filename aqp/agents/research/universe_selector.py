@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a quant universe-curation agent. Given a thesis and constraints
 (sector, market cap, liquidity, regulatory exposure), propose a candidate universe.
 

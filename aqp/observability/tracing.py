@@ -18,6 +18,7 @@ The legacy ``AQP_OTEL_ENDPOINT`` / ``AQP_OTEL_PROTOCOL`` /
 from __future__ import annotations
 
 import logging
+import sys
 from typing import Any
 
 from aqp.config import settings
@@ -43,10 +44,35 @@ def _otel_available() -> bool:
     try:
         import opentelemetry  # noqa: F401
         import opentelemetry.sdk  # noqa: F401
+        from opentelemetry import trace
 
+        if "pytest" in sys.modules:
+            _allow_pytest_tracer_provider_override(trace)
         return True
     except ImportError:
         return False
+
+
+def _allow_pytest_tracer_provider_override(trace: Any) -> None:
+    """Let tests replace the global provider between cases.
+
+    OpenTelemetry intentionally allows setting the provider only once per
+    process. The test suite installs an in-memory provider in a late test after
+    API imports may already have configured tracing, so we relax the guard only
+    when pytest is loaded.
+    """
+    if getattr(trace.set_tracer_provider, "_aqp_pytest_patch", False):
+        return
+    original = trace.set_tracer_provider
+
+    def _set_tracer_provider(provider: Any, *args: Any, **kwargs: Any) -> Any:
+        once = getattr(trace, "_TRACER_PROVIDER_SET_ONCE", None)
+        if once is not None and hasattr(once, "_done"):
+            once._done = False  # noqa: SLF001
+        return original(provider, *args, **kwargs)
+
+    _set_tracer_provider._aqp_pytest_patch = True  # type: ignore[attr-defined]
+    trace.set_tracer_provider = _set_tracer_provider
 
 
 def configure_tracing(service_name: str | None = None) -> Any:

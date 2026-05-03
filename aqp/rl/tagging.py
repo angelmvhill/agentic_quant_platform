@@ -11,7 +11,7 @@ Importing this module is a side-effect — call ``apply_tags()`` once.
 from __future__ import annotations
 
 import logging
-from typing import Iterable
+from collections.abc import Iterable
 
 from aqp.core.registry import tag_class
 

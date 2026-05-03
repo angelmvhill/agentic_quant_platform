@@ -6,7 +6,7 @@ Run from inside the ``aqp-api`` (or ``aqp-worker``) container::
 
 Steps performed:
 
-1. Verify the Nemotron Director model is pulled in Ollama
+1. Verify the configured Director model is pulled in Ollama
    (``GET /api/tags``); pull it if missing (``POST /api/pull``).
 2. Resolve which of ``cfpb``, ``uspto``, ``fda``, ``sec`` actually exist
    under ``--host-root`` (defaults to ``/host-downloads``).
@@ -33,11 +33,10 @@ from typing import Any
 
 import httpx
 
-
 DEFAULT_HOST_ROOT = "/host-downloads"
 DEFAULT_OLLAMA_BASE = "http://host.docker.internal:11434"
 DEFAULT_LOG_DIR = "/warehouse/logs"
-DEFAULT_MODEL = "nemotron-3-nano:30b"
+DEFAULT_MODEL = "qwen2.5:7b"
 REGULATORY_SOURCES = ("cfpb", "uspto", "fda", "sec")
 REGULATORY_NAMESPACES = {
     "cfpb": "aqp_cfpb",

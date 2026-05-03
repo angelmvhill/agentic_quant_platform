@@ -24,7 +24,7 @@ import json
 import logging
 import time
 import uuid
-from collections.abc import Iterable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
@@ -107,6 +107,8 @@ class AgentRuntime:
         self._tool_calls = 0
         self._rag_hits = 0
         self._tool_cache: dict[str, Any] = {}
+        self._memory_cache: Any | None = None
+        self._memory_loaded = False
 
     # ------------------------------------------------------------------ public API
     def run(self, inputs: Mapping[str, Any]) -> AgentRunResult:
@@ -237,7 +239,7 @@ class AgentRuntime:
         if not self.spec.rag:
             return ""
         try:
-            from aqp.rag import HierarchicalRAG, RAGPlan, get_default_rag
+            from aqp.rag import HierarchicalRAG, get_default_rag
         except Exception:  # pragma: no cover
             logger.debug("RAG unavailable; skipping retrieval", exc_info=True)
             return ""
@@ -309,9 +311,8 @@ class AgentRuntime:
     def _memory(self):
         if self.spec.memory.disabled():
             return None
-        cached = self._tool_cache.get("__memory__")
-        if cached is not None:
-            return cached
+        if self._memory_loaded:
+            return self._memory_cache
         try:
             if self.spec.memory.kind == "redis_hybrid":
                 from aqp.llm.memory import RedisHybridMemory
@@ -333,7 +334,8 @@ class AgentRuntime:
         except Exception:  # noqa: BLE001
             logger.debug("Memory binding failed", exc_info=True)
             mem = None
-        self._tool_cache["__memory__"] = mem
+        self._memory_cache = mem
+        self._memory_loaded = True
         return mem
 
     def _working_push(self, message: str) -> None:
@@ -515,6 +517,41 @@ class AgentRuntime:
                 )
         return out
 
+    _TOOL_ALIASES = {
+        "get_news_sentiment": "news_digest",
+        "news_sentiment": "news_digest",
+        "get_news": "news_digest",
+        "fetch_news": "news_digest",
+        "get_financial_news": "news_digest",
+        "financial_news": "news_digest",
+        "regulatory_search": "regulatory_lookup",
+        "lookup_regulatory": "regulatory_lookup",
+    }
+
+    @classmethod
+    def _normalise_tool_name(cls, name: str) -> str:
+        return str(name or "").strip().lower().replace("-", "_").replace(" ", "_")
+
+    @classmethod
+    def _resolve_requested_tool(
+        cls,
+        tool_lookup: dict[str, Any],
+        requested_name: str,
+    ) -> tuple[str, Any | None]:
+        """Map local-model tool aliases back to declared registry names."""
+        requested = str(requested_name or "")
+        normalised = cls._normalise_tool_name(requested)
+        candidates = [
+            requested,
+            requested.strip(),
+            normalised,
+            cls._TOOL_ALIASES.get(normalised, ""),
+        ]
+        for candidate in candidates:
+            if candidate and candidate in tool_lookup:
+                return candidate, tool_lookup[candidate]
+        return requested, None
+
     def _execute_tool_call(self, tool: Any, arguments: dict[str, Any]) -> str:
         """Run ``tool._run(**arguments)`` and stringify the result.
 
@@ -559,6 +596,9 @@ class AgentRuntime:
         tools = self._resolve_tools()
         tool_schemas = [self._tool_to_openai_schema(t) for t in tools] if tools else None
         tool_lookup = {getattr(t, "name", type(t).__name__): t for t in tools}
+        tool_lookup.update(
+            {self._normalise_tool_name(name): tool for name, tool in list(tool_lookup.items())}
+        )
         working: list[dict[str, Any]] = list(messages)
         last_result: Any = None
         for turn in range(self._MAX_TOOL_TURNS + 1):
@@ -647,7 +687,7 @@ class AgentRuntime:
             # ``tool``-role messages.
             for call in calls:
                 self._tool_calls += 1
-                tool = tool_lookup.get(call["name"])
+                tool_name, tool = self._resolve_requested_tool(tool_lookup, call["name"])
                 if tool is None:
                     tool_payload = json.dumps(
                         {"error": f"unknown tool {call['name']!r}"}
@@ -660,8 +700,11 @@ class AgentRuntime:
                     tool_payload = self._execute_tool_call(tool, args)
                 self._add_step(
                     kind="tool",
-                    name=call["name"],
-                    inputs={"arguments": call.get("arguments_json", "")},
+                    name=tool_name or call["name"],
+                    inputs={
+                        "requested_tool": call["name"],
+                        "arguments": call.get("arguments_json", ""),
+                    },
                     output={"result": tool_payload[:4000]},
                     duration_ms=0.0,
                 )
@@ -727,7 +770,7 @@ def _try_json(text: str) -> dict[str, Any]:
 
 
 def _has_rationale(output: dict[str, Any]) -> bool:
-    keys = {k.lower() for k in output.keys()}
+    keys = {k.lower() for k in output}
     return bool({"rationale", "reason", "reasoning", "explanation", "thesis"} & keys)
 
 

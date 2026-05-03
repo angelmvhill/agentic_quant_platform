@@ -381,17 +381,16 @@ def _left_rail(
                     disabled=disabled,
                 )
         if catalog_rows:
-            with solara.Card("Top symbols"):
-                with solara.Column(gap="4px"):
-                    for row in catalog_rows[:10]:
-                        vt = row.get("vt_symbol") or row.get("symbol") or "?"
-                        rows = row.get("n_bars") or row.get("rows") or "?"
-                        solara.Button(
-                            label=f"{vt} ({rows} rows)",
-                            on_click=lambda vt=vt: selected.set(vt),
-                            outlined=True,
-                            dense=True,
-                        )
+            with solara.Card("Top symbols"), solara.Column(gap="4px"):
+                for row in catalog_rows[:10]:
+                    vt = row.get("vt_symbol") or row.get("symbol") or "?"
+                    rows = row.get("n_bars") or row.get("rows") or "?"
+                    solara.Button(
+                        label=f"{vt} ({rows} rows)",
+                        on_click=lambda vt=vt: selected.set(vt),
+                        outlined=True,
+                        dense=True,
+                    )
 
 
 def _chart_tab(

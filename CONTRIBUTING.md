@@ -11,7 +11,7 @@ Welcome. This file is the **human onboarding guide** — pair with
 | Python 3.11 | Type-checks and `match` statements | `pyenv install 3.11.x` or your distro's package |
 | Docker Desktop | Default deployment uses docker-compose | Install from docker.com |
 | **File sharing** for the warehouse drive | Iceberg lives at `C:/aqp-warehouse` | Settings → Resources → File sharing → add `/c/aqp-warehouse` (Windows) |
-| Ollama (host) | Default LLM provider | `ollama serve` + `ollama pull nemotron-3-nano:30b` |
+| Ollama (host) | Default LLM provider | `ollama serve` + `ollama pull llama3.2` + `ollama pull qwen2.5:7b` |
 | Postgres client | Inspecting the ledger | `psql` or any GUI |
 | Optional: NVIDIA GPU | Faster ML / LLM inference | – |
 | Optional: Node 20+ | webui dev | `nvm install 20` |

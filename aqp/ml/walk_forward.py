@@ -12,8 +12,9 @@ Source: ``inspiration/akquant-main/examples/10_ml_walk_forward.py`` and
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Iterator, Protocol
+from typing import Any, Protocol
 
 import numpy as np
 import pandas as pd
@@ -148,7 +149,7 @@ class SimpleSliceDataset:
             idx = idx.get_level_values(0)
         return pd.DatetimeIndex(idx)
 
-    def slice_dates(self, start: pd.Timestamp, end: pd.Timestamp) -> "SimpleSliceDataset":
+    def slice_dates(self, start: pd.Timestamp, end: pd.Timestamp) -> SimpleSliceDataset:
         sub = self.frame.loc[start:end].copy()
         return SimpleSliceDataset(frame=sub, label_col=self.label_col)
 

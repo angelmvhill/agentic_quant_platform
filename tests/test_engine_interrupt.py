@@ -2,12 +2,10 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import datetime
 from typing import Any
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from aqp.backtest.engine import EventDrivenBacktester
 from aqp.backtest.interrupts import (

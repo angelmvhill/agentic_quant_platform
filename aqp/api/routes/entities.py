@@ -18,7 +18,6 @@ from aqp.persistence.db import get_session
 from aqp.persistence.models import Instrument
 from aqp.persistence.models_entities import (
     EntityRelationship,
-    ExecutiveCompensation,
     Industry,
     IndustryClassification,
     Issuer,

@@ -6,7 +6,6 @@ from typing import Any
 from aqp.agents.financial.equity_sections.section_base import BaseSectionAgent
 from aqp.core.registry import register
 
-
 _SYSTEM = """\
 You are the senior PM signing off the research note. Produce exactly
 THREE crisp takeaways an investor would walk away with. Bullets only,

@@ -22,6 +22,7 @@ from aqp.core.corporate_actions import (
     MapFileEntry,
 )
 from aqp.core.domain import (
+    ETF,
     AccountId,
     ActorId,
     AggressorSide,
@@ -43,7 +44,6 @@ from aqp.core.domain import (
     Commodity,
     CompanyNews,
     ContingencyType,
-    CorporateActionEvent as DomainCorporateActionEvent,
     CorporateActionKind,
     CorporateEntity,
     CotReport,
@@ -58,13 +58,11 @@ from aqp.core.domain import (
     EntityKind,
     EntityRelationship,
     EntityRelationshipType,
-    ETF,
     Equity,
     FederalFundsRate,
     FilingEvent,
     FilingType,
     FinancialRatios,
-    IncomeStatement,
     ForwardPrice,
     FredObservation,
     FredSeriesMeta,
@@ -76,24 +74,24 @@ from aqp.core.domain import (
     IdentifierScheme,
     IdentifierSet,
     IdentifierValue,
+    IncomeStatement,
     IndexInstrument,
+    Industry,
     IndustryClassification,
     IndustryClassificationScheme,
     InsiderTransaction,
     InsiderTransactionEvent,
     InstitutionalHolding,
-    Instrument as DomainInstrument,
     InstrumentClass,
     InstrumentId,
     IPOEvent,
     IssuerRef,
-    Issuer as DomainIssuer,
     KeyExecutive,
     KeyMetrics,
     LimitOrder,
     Location,
-    MarkPriceUpdate,
     MarketOrder,
+    MarkPriceUpdate,
     MergerEvent,
     Money,
     NewsEvent,
@@ -117,11 +115,10 @@ from aqp.core.domain import (
     Quantity,
     QuoteTick,
     RegulatoryEvent,
-    SettlementType,
+    Sector,
     Sentiment,
     SentimentLabel,
-    Sector,
-    Industry,
+    SettlementType,
     StopLimitOrder,
     StopMarketOrder,
     Symbol2,
@@ -137,6 +134,15 @@ from aqp.core.domain import (
     YieldCurve,
     instrument_class_for,
     register_instrument_class,
+)
+from aqp.core.domain import (
+    CorporateActionEvent as DomainCorporateActionEvent,
+)
+from aqp.core.domain import (
+    Instrument as DomainInstrument,
+)
+from aqp.core.domain import (
+    Issuer as DomainIssuer,
 )
 from aqp.core.events import (
     EVENT_AGENT,
@@ -247,14 +253,12 @@ from aqp.core.types import (
     iter_subscriptions,
     money,
 )
-
 from aqp.providers.base import (
     CostTier,
     Data,
     Fetcher,
     QueryParams,
 )
-
 
 __all__ = [
     # Types (scalar)

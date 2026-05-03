@@ -17,15 +17,14 @@ Every crew returns a ``dict`` with a ``"report"`` JSON payload and a
 """
 from __future__ import annotations
 
+# FinRobot-style section agents — registered as ``kind="equity_section"``.
+import aqp.agents.financial.equity_sections  # noqa: F401
 from aqp.agents.financial.base import BaseFinancialCrew, FinancialReport
 from aqp.agents.financial.document_analyzer import DocumentAnalyzer
 from aqp.agents.financial.equity_research import EquityResearch
 from aqp.agents.financial.financial_report import FinancialReportBuilder
 from aqp.agents.financial.market_forecaster import MarketForecaster
 from aqp.agents.financial.trade_strategist import TradeStrategist
-
-# FinRobot-style section agents — registered as ``kind="equity_section"``.
-import aqp.agents.financial.equity_sections  # noqa: F401
 
 __all__ = [
     "BaseFinancialCrew",

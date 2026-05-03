@@ -1,12 +1,10 @@
 """FinRobot Document Analyzer — SEC filings / transcripts summarisation + Q&A."""
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from aqp.agents.financial.base import BaseFinancialCrew, FinancialReport
 from aqp.core.registry import agent
-
 
 _SYSTEM = """\
 You are a financial-document analyst. Read the provided document (excerpt)

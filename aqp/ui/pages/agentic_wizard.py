@@ -26,8 +26,7 @@ from aqp.ui.api_client import get, post
 from aqp.ui.components.data.task_streamer import TaskStreamer
 from aqp.ui.components.debate_visualizer import DebateVisualizer
 from aqp.ui.components.decision_timeline import DecisionTimeline
-from aqp.ui.components.layout.stepper import StepSpec, Stepper
-
+from aqp.ui.components.layout.stepper import Stepper, StepSpec
 
 # ---------------------------------------------------------------------------
 # Helpers

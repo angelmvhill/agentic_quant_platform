@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import logging
+from contextlib import suppress
+from importlib.util import find_spec
 
 from celery import Celery
 from celery.signals import (
@@ -18,42 +20,55 @@ logger = logging.getLogger(__name__)
 
 _FINOPS_HEADER_KEY = "x-aqp-finops"
 
+_TASK_MODULES = [
+    "aqp.tasks.backtest_tasks",
+    "aqp.tasks.training_tasks",
+    "aqp.tasks.agent_tasks",
+    "aqp.tasks.agentic_backtest_tasks",
+    "aqp.tasks.finetune_tasks",
+    "aqp.tasks.ingestion_tasks",
+    "aqp.tasks.paper_tasks",
+    "aqp.tasks.factor_tasks",
+    "aqp.tasks.ml_tasks",
+    "aqp.tasks.optimize_tasks",
+    "aqp.tasks.feature_set_tasks",
+    "aqp.tasks.equity_report_tasks",
+    "aqp.tasks.llm_tasks",
+    # New: regulatory data ingestion (CFPB / FDA / USPTO)
+    "aqp.tasks.regulatory_tasks",
+    # New: hierarchical RAG indexing + Raptor summarisation
+    "aqp.tasks.rag_tasks",
+    # New: agent-team runners (research / selection / trader / analysis)
+    "aqp.tasks.research_tasks",
+    "aqp.tasks.selection_tasks",
+    "aqp.tasks.analysis_tasks",
+    # Data fabric expansion: entity registry + DataHub sync.
+    "aqp.tasks.entity_tasks",
+    "aqp.tasks.datahub_tasks",
+    # Phase 5 — FinOps governance audit task.
+    "aqp.tasks.finops_tasks",
+]
+
+if find_spec("aqp.data.airbyte") is not None:
+    _TASK_MODULES.append("aqp.tasks.airbyte_tasks")
+else:
+    logger.warning("Airbyte task module disabled: aqp.data.airbyte is not installed")
+
+if find_spec("aqp.data.pipelines.dataset_preset_pipelines") is not None:
+    # Inspiration rehydration — dataset preset ingestion tasks.
+    _TASK_MODULES.append("aqp.tasks.dataset_preset_tasks")
+else:
+    logger.warning(
+        "Dataset preset task module disabled: "
+        "aqp.data.pipelines.dataset_preset_pipelines is not installed"
+    )
+
 
 celery_app = Celery(
     "aqp",
     broker=settings.redis_url,
     backend=settings.redis_url,
-    include=[
-        "aqp.tasks.backtest_tasks",
-        "aqp.tasks.training_tasks",
-        "aqp.tasks.agent_tasks",
-        "aqp.tasks.agentic_backtest_tasks",
-        "aqp.tasks.finetune_tasks",
-        "aqp.tasks.ingestion_tasks",
-        "aqp.tasks.paper_tasks",
-        "aqp.tasks.factor_tasks",
-        "aqp.tasks.ml_tasks",
-        "aqp.tasks.optimize_tasks",
-        "aqp.tasks.feature_set_tasks",
-        "aqp.tasks.equity_report_tasks",
-        "aqp.tasks.llm_tasks",
-        # New: regulatory data ingestion (CFPB / FDA / USPTO)
-        "aqp.tasks.regulatory_tasks",
-        # New: hierarchical RAG indexing + Raptor summarisation
-        "aqp.tasks.rag_tasks",
-        # New: agent-team runners (research / selection / trader / analysis)
-        "aqp.tasks.research_tasks",
-        "aqp.tasks.selection_tasks",
-        "aqp.tasks.analysis_tasks",
-        # Data fabric expansion: entity registry + DataHub sync.
-        "aqp.tasks.entity_tasks",
-        "aqp.tasks.datahub_tasks",
-        "aqp.tasks.airbyte_tasks",
-        # Phase 5 — FinOps governance audit task.
-        "aqp.tasks.finops_tasks",
-        # Inspiration rehydration — dataset preset ingestion tasks.
-        "aqp.tasks.dataset_preset_tasks",
-    ],
+    include=_TASK_MODULES,
 )
 
 celery_app.conf.update(
@@ -156,10 +171,8 @@ def _record_finops_on_span(sender=None, task_id=None, task=None, **_kwargs):
         # producer). Re-stamp from local Settings as a defence-in-depth.
         finops = settings.finops_labels(task_name=str(sender))
     # Make the labels available to ``aqp.tasks._progress.emit`` via attribute.
-    try:
-        setattr(task, "_aqp_finops", dict(finops))
-    except Exception:  # noqa: BLE001
-        pass
+    with suppress(Exception):
+        task._aqp_finops = dict(finops)  # noqa: SLF001
     try:
         from opentelemetry import trace  # type: ignore[import-not-found]
 

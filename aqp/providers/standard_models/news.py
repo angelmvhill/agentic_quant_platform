@@ -1,7 +1,7 @@
 """News standard models."""
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
+from datetime import date as dateType
 
 from pydantic import Field, field_validator
 

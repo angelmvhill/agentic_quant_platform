@@ -60,10 +60,7 @@ class LinearModel(Model):
             return self
 
         # OLS fallback via lstsq.
-        if self.fit_intercept:
-            X_ = np.hstack([np.ones((X.shape[0], 1)), X])
-        else:
-            X_ = X
+        X_ = np.hstack([np.ones((X.shape[0], 1)), X]) if self.fit_intercept else X
         beta, *_ = np.linalg.lstsq(X_, y, rcond=None)
         if self.fit_intercept:
             self.intercept_ = float(beta[0])

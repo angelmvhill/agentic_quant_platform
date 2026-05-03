@@ -12,7 +12,6 @@ JSON contracts far more reliably when the contract is printed verbatim.
 """
 from __future__ import annotations
 
-
 ANALYST_SCHEMA = """\
 Respond ONLY with a JSON object matching:
 {

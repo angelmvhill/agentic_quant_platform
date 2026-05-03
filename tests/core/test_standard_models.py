@@ -4,8 +4,6 @@ from __future__ import annotations
 import importlib
 import pkgutil
 
-import pytest
-
 import aqp.providers.standard_models as std_models
 from aqp.providers.base import Data, QueryParams
 

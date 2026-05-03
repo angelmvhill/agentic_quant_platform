@@ -29,7 +29,7 @@ def main() -> int:
         mb = round(f.total_bytes / (1024 * 1024), 1)
         print(f"   - {f.family}: {members} member(s), {mb} MB")
 
-    print(f"[smoke] calling Director (LLM) ...")
+    print("[smoke] calling Director (LLM) ...")
     t0 = time.time()
     plan = plan_ingestion(
         ds,

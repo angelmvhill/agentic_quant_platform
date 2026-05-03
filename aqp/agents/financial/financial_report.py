@@ -7,7 +7,6 @@ from typing import Any
 from aqp.agents.financial.base import BaseFinancialCrew, FinancialReport
 from aqp.core.registry import agent
 
-
 _SYSTEM = """\
 You are an equity research writer. Given structured inputs (fundamentals,
 sentiment, technicals, forecasts, document highlights) produce a polished

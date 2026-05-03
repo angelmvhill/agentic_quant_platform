@@ -1,7 +1,7 @@
 """Regression tests for provider-policy resolver and wiring."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 
 def _sample_bars(vt_symbol: str) -> pd.DataFrame:
-    ts = datetime(2024, 1, 2, tzinfo=timezone.utc)
+    ts = datetime(2024, 1, 2, tzinfo=UTC)
     return pd.DataFrame(
         [
             {

@@ -2,14 +2,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from aqp.core.registry import register
 from aqp.data.cointegration import engle_granger
-from aqp.strategies.qtradex.alphas import BasicAlphaBase, _ema, _rsi, _sma
+from aqp.strategies.qtradex.alphas import BasicAlphaBase, _rsi
 
 logger = logging.getLogger(__name__)
 

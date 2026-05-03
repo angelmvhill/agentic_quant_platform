@@ -41,7 +41,7 @@ flowchart TB
     end
 
     subgraph llms [LLM tier]
-        Ollama["Ollama (host)<br/>nemotron / nemotron-3-nano:30b / llama3.2"]
+        Ollama["Ollama (host)<br/>llama3.2 / qwen2.5:7b"]
         vLLM["vLLM (legacy compose profile)<br/>OpenAI-compatible :8002"]
         LiteLLM["LiteLLM router<br/>aqp/llm/providers/router.py"]
     end

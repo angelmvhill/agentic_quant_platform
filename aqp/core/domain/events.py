@@ -17,7 +17,8 @@ from here so back-compat callers keep working.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date as dateType, datetime
+from datetime import date as dateType
+from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
@@ -27,7 +28,6 @@ from aqp.core.domain.enums import (
 )
 from aqp.core.domain.identifiers import InstrumentId
 from aqp.core.domain.issuer import IssuerRef
-
 
 # ---------------------------------------------------------------------------
 # Base

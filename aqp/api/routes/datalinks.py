@@ -15,9 +15,9 @@ from sqlalchemy import func, select
 from aqp.persistence.db import get_session
 from aqp.persistence.models import (
     DataLink,
-    DataSource,
     DatasetCatalog,
     DatasetVersion,
+    DataSource,
     Instrument,
 )
 

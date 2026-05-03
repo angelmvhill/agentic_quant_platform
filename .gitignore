@@ -181,3 +181,9 @@ cython_debug/
 .cursorindexingignore
 inspiration/
 data/
+
+# Source directories under webui intentionally use these names.
+!webui/lib/
+!webui/lib/**
+!webui/components/data/
+!webui/components/data/**

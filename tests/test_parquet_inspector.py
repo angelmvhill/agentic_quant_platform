@@ -4,7 +4,6 @@ from __future__ import annotations
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-import pytest
 
 from aqp.data.parquet_inspector import inspect_root
 

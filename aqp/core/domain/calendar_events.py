@@ -7,7 +7,8 @@ calendars plus exchange-calendar extensions (:class:`MarketHoliday`,
 """
 from __future__ import annotations
 
-from datetime import date as dateType, datetime, time
+from datetime import date as dateType
+from datetime import datetime, time
 from decimal import Decimal
 from typing import Any
 

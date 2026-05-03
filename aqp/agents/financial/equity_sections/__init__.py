@@ -11,21 +11,21 @@ Research UI can dynamically list them and let users opt sections in /
 out.
 """
 
-from aqp.agents.financial.equity_sections.section_base import BaseSectionAgent
-from aqp.agents.financial.equity_sections.tagline import TaglineAgent
 from aqp.agents.financial.equity_sections.company_overview import CompanyOverviewAgent
-from aqp.agents.financial.equity_sections.investment_overview import (
-    InvestmentOverviewAgent,
-)
-from aqp.agents.financial.equity_sections.valuation_overview import (
-    ValuationOverviewAgent,
-)
-from aqp.agents.financial.equity_sections.risks import RisksAgent
 from aqp.agents.financial.equity_sections.competitor_analysis import (
     CompetitorAnalysisAgent,
 )
+from aqp.agents.financial.equity_sections.investment_overview import (
+    InvestmentOverviewAgent,
+)
 from aqp.agents.financial.equity_sections.major_takeaways import MajorTakeawaysAgent
 from aqp.agents.financial.equity_sections.news_summary import NewsSummaryAgent
+from aqp.agents.financial.equity_sections.risks import RisksAgent
+from aqp.agents.financial.equity_sections.section_base import BaseSectionAgent
+from aqp.agents.financial.equity_sections.tagline import TaglineAgent
+from aqp.agents.financial.equity_sections.valuation_overview import (
+    ValuationOverviewAgent,
+)
 
 __all__ = [
     "BaseSectionAgent",

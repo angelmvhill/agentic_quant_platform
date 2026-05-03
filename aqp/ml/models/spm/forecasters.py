@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import Any
 
 from aqp.core.registry import register
 from aqp.ml.models.spm._torch_base import TorchForecasterBase

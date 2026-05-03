@@ -9,10 +9,20 @@ from dagster import Definitions
 
 from aqp.dagster.assets import (
     airbyte as airbyte_assets,
+)
+from aqp.dagster.assets import (
     catalog as catalog_assets,
+)
+from aqp.dagster.assets import (
     compaction as compaction_assets,
+)
+from aqp.dagster.assets import (
     entities as entity_assets,
+)
+from aqp.dagster.assets import (
     profiling as profiling_assets,
+)
+from aqp.dagster.assets import (
     sources as source_assets,
 )
 from aqp.dagster.jobs import ALL_JOBS

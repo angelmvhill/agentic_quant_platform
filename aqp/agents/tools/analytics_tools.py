@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
@@ -49,6 +48,7 @@ class CointegrationTool(BaseTool):
     def _run(self, vt_symbol_a: str, vt_symbol_b: str, period_days: int = 252, z_window: int = 60) -> str:
         try:
             from datetime import datetime, timedelta
+
             from aqp.core.types import Symbol
             from aqp.data.cointegration import engle_granger
             from aqp.data.duckdb_engine import DuckDBHistoryProvider
@@ -96,6 +96,7 @@ class RegimeClassifierTool(BaseTool):
     def _run(self, vt_symbol: str, period_days: int = 63, adx_threshold: float = 25.0) -> str:
         try:
             from datetime import datetime, timedelta
+
             from aqp.core.types import Symbol
             from aqp.data.duckdb_engine import DuckDBHistoryProvider
             from aqp.data.regime import ADXRegimeClassifier
@@ -143,6 +144,7 @@ class RealisedVolTool(BaseTool):
     def _run(self, vt_symbol: str, period_days: int = 63, estimator_period: int = 20) -> str:
         try:
             from datetime import datetime, timedelta
+
             from aqp.core.types import Symbol
             from aqp.data.duckdb_engine import DuckDBHistoryProvider
             from aqp.data.realised_volatility import compare_estimators
@@ -187,6 +189,7 @@ class FactorScreenTool(BaseTool):
     def _run(self, vt_symbols: list[str], expression: str, period_days: int = 120, top_k: int = 10) -> str:
         try:
             from datetime import datetime, timedelta
+
             from aqp.core.types import Symbol
             from aqp.data.duckdb_engine import DuckDBHistoryProvider
             from aqp.data.factor_expression import FactorEngine, panel_from_bars
@@ -231,6 +234,7 @@ class HftMetricsTool(BaseTool):
     def _run(self, backtest_run_id: str, days_per_year: int = 365) -> str:
         try:
             import pandas as pd
+
             from aqp.backtest.hft_metrics import hft_summary
             # In production this would load the backtest result from Postgres.
             # For now we return a stub indicating where the data should come from.
@@ -270,6 +274,7 @@ class MultiIndicatorVoteTool(BaseTool):
     def _run(self, vt_symbol: str, period_days: int = 120, indicators: list[str] | None = None) -> str:
         try:
             from datetime import datetime, timedelta
+
             from aqp.core.types import Symbol
             from aqp.data.duckdb_engine import DuckDBHistoryProvider
             from aqp.data.indicators_zoo import IndicatorZoo
@@ -336,6 +341,7 @@ class ChartPatternTool(BaseTool):
     def _run(self, vt_symbol: str, period_days: int = 180, swing_window: int = 5) -> str:
         try:
             from datetime import datetime, timedelta
+
             from aqp.core.types import Symbol
             from aqp.data.duckdb_engine import DuckDBHistoryProvider
             from aqp.data.patterns import detect_all

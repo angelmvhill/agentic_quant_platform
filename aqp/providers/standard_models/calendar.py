@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from datetime import date as dateType
 
-from pydantic import Field
-
 from aqp.core.domain.calendar_events import (
     CalendarDividend,
     CalendarEarnings,

@@ -12,7 +12,6 @@ import logging
 from typing import Any
 
 import numpy as np
-import pandas as pd
 
 from aqp.core.registry import register
 from aqp.ml.models.spm._torch_base import TorchForecasterBase, TrainConfig

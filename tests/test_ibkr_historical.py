@@ -1,7 +1,6 @@
 """Unit tests for IBKR historical service logic."""
 from __future__ import annotations
 
-import asyncio
 from datetime import datetime
 from typing import Any
 
@@ -190,7 +189,7 @@ async def test_fetch_bars_retries_on_timeout_once(monkeypatch: pytest.MonkeyPatc
         async def reqHistoricalDataAsync(self, **_kwargs: Any) -> list[Any]:
             self.hist_calls += 1
             if self.hist_calls == 1:
-                raise asyncio.TimeoutError()
+                raise TimeoutError()
             return [_Bar(int(pd.Timestamp("2024-01-02").timestamp()))]
 
         def isConnected(self) -> bool:
@@ -250,7 +249,7 @@ async def test_fetch_bars_raises_timeout_error_after_all_retries(
 
         async def reqHistoricalDataAsync(self, **_kwargs: Any) -> list[Any]:
             self.hist_calls += 1
-            raise asyncio.TimeoutError()
+            raise TimeoutError()
 
         def isConnected(self) -> bool:
             return self._connected

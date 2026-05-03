@@ -16,12 +16,12 @@ contract:
 All three are :class:`IUniverseSelectionModel` / :class:`IAlphaModel`
 implementations so they slot into the Lean 5-stage framework.
 """
-from aqp.strategies.adaptive_rotation.market_regime import MarketRegimeClassifier
 from aqp.strategies.adaptive_rotation.gics_buckets import (
     BUCKET_TO_DEFAULT_WEIGHT,
-    GICSBucketUniverseSelector,
     SECTOR_TO_BUCKET,
+    GICSBucketUniverseSelector,
 )
+from aqp.strategies.adaptive_rotation.market_regime import MarketRegimeClassifier
 from aqp.strategies.adaptive_rotation.rotation_alpha import AdaptiveRotationAlpha
 
 __all__ = [

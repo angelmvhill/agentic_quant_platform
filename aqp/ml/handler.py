@@ -186,10 +186,7 @@ class DataHandlerLP(DataHandler):
         infer = _apply_processors(infer, self.infer_processors, fit_window=self._fit_window())
         self._infer = infer
 
-        if self.process_type == "append":
-            learn = infer.copy()
-        else:
-            learn = shared.copy()
+        learn = infer.copy() if self.process_type == "append" else shared.copy()
         learn = _apply_processors(learn, self.learn_processors, fit_window=self._fit_window())
         self._learn = learn
 

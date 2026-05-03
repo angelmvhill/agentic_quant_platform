@@ -1,8 +1,6 @@
 """CrewAI tools that expose the hierarchical RAG to agents."""
 from __future__ import annotations
 
-from typing import Any
-
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 

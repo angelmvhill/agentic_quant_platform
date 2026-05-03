@@ -11,6 +11,7 @@ OpenTelemetry is missing.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from typing import Any
 
@@ -45,8 +46,6 @@ def instrument_dagster() -> None:
     tracer = get_tracer("aqp.dagster")
 
     try:
-        from dagster._core.events import DagsterEventType
-        from dagster._core.execution.context.system import StepExecutionContext
         from dagster._core.instance import DagsterInstance
     except Exception:  # noqa: BLE001 - Dagster internals can shift
         logger.exception("Failed to import Dagster internals; tracing not attached")
@@ -59,10 +58,8 @@ def instrument_dagster() -> None:
 
     def _report(self: Any, message: str, *args: Any, **kwargs: Any) -> Any:
         with tracer.start_as_current_span("dagster.event") as span:
-            try:
+            with contextlib.suppress(Exception):
                 span.set_attribute("dagster.message", message[:120])
-            except Exception:
-                pass
             return original_report(self, message, *args, **kwargs)
 
     DagsterInstance.report_engine_event = _report  # type: ignore[assignment]

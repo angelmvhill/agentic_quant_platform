@@ -275,7 +275,7 @@ class A3CAgent:
         self._build(obs_dim, action_dim)
         all_rewards: list[float] = []
         ep_reward = 0.0
-        for step in range(total_timesteps):
+        for _step in range(total_timesteps):
             obs_t = torch.as_tensor(np.asarray(obs).flatten(), dtype=torch.float32).unsqueeze(0)
             features = self.shared(obs_t)
             probs = self.policy_head(features)
@@ -343,7 +343,7 @@ class ActorCriticExperienceReplayAgent(A3CAgent):
         self._build(obs_dim, action_dim)
         all_rewards: list[float] = []
         ep_reward = 0.0
-        for step in range(total_timesteps):
+        for _step in range(total_timesteps):
             obs_t = torch.as_tensor(np.asarray(obs).flatten(), dtype=torch.float32).unsqueeze(0)
             features = self.shared(obs_t)
             probs = self.policy_head(features)

@@ -7,14 +7,12 @@ import pytest
 
 from aqp.core.domain.identifiers import (
     AccountId,
-    ClientOrderId,
     IdentifierScheme,
     IdentifierSet,
     IdentifierValue,
     InstrumentId,
     StrategyId,
     Symbol2,
-    TradeId,
     Venue,
 )
 

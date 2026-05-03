@@ -1,10 +1,11 @@
 """ETF reference, pricing, holdings, sector/country breakdown."""
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
+from datetime import date as dateType
+from datetime import datetime
 from decimal import Decimal
 
-from pydantic import Field, field_validator
+from pydantic import field_validator
 
 from aqp.providers.base import Data, QueryParams
 

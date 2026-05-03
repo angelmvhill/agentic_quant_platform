@@ -23,7 +23,8 @@ serialisable and safe to pass between Celery workers.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date as dateType, datetime
+from datetime import date as dateType
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, ClassVar
 
@@ -44,13 +45,12 @@ from aqp.core.domain.identifiers import (
 )
 from aqp.core.domain.money import Currency, currency_of
 
-
 # ---------------------------------------------------------------------------
 # Registry: (AssetClass, InstrumentClass) -> class
 # ---------------------------------------------------------------------------
 
 
-_INSTRUMENT_REGISTRY: dict[tuple[AssetClass, InstrumentClass], type["Instrument"]] = {}
+_INSTRUMENT_REGISTRY: dict[tuple[AssetClass, InstrumentClass], type[Instrument]] = {}
 
 
 def register_instrument_class(
@@ -63,7 +63,7 @@ def register_instrument_class(
     registration time to catch accidental double-registration early.
     """
 
-    def _wrap(cls: type["Instrument"]) -> type["Instrument"]:
+    def _wrap(cls: type[Instrument]) -> type[Instrument]:
         key = (asset_class, instrument_class)
         existing = _INSTRUMENT_REGISTRY.get(key)
         if existing is not None and existing is not cls:
@@ -81,7 +81,7 @@ def register_instrument_class(
 def instrument_class_for(
     asset_class: AssetClass | str,
     instrument_class: InstrumentClass | str,
-) -> type["Instrument"] | None:
+) -> type[Instrument] | None:
     """Return the registered :class:`Instrument` subclass for a given pair."""
     ac = asset_class if isinstance(asset_class, AssetClass) else AssetClass(asset_class)
     ic = (

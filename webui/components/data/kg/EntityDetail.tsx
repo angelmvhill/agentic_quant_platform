@@ -23,7 +23,7 @@ import { useApiQuery } from "@/lib/api/hooks";
 
 import { RelationshipGraph } from "./RelationshipGraph";
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 interface IssuerDetailRow {
   id: string;

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from aqp.persistence import Base
 
-
 EXPECTED_NEW_TABLES = {
     # Instrument subclass tables
     "instrument_equity",

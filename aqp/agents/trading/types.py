@@ -35,7 +35,7 @@ class Rating5(StrEnum):
     STRONG_SELL = "strong_sell"
 
     @classmethod
-    def numeric(cls, rating: "Rating5 | str") -> int:
+    def numeric(cls, rating: Rating5 | str) -> int:
         """Return a signed integer in ``{-2, -1, 0, 1, 2}`` for the rating."""
         r = rating if isinstance(rating, cls) else parse_rating(str(rating))
         return {
@@ -79,7 +79,7 @@ class TraderAction(StrEnum):
     HOLD = "HOLD"
 
     @classmethod
-    def from_rating(cls, rating: Rating5 | str) -> "TraderAction":
+    def from_rating(cls, rating: Rating5 | str) -> TraderAction:
         """Derive an action from a rating using the TradingAgents convention."""
         r = rating if isinstance(rating, Rating5) else parse_rating(str(rating))
         if r in (Rating5.STRONG_BUY, Rating5.BUY):
@@ -207,7 +207,7 @@ class AgentDecision(BaseModel):
         timestamp: datetime,
         *,
         rationale: str = "No actionable signal.",
-    ) -> "AgentDecision":
+    ) -> AgentDecision:
         """Convenience: produce a neutral ``HOLD`` decision."""
         return cls(
             vt_symbol=vt_symbol,

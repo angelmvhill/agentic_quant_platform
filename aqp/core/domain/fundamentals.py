@@ -12,7 +12,8 @@ round-trip without having to predeclare every long-tail field.
 """
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
+from datetime import date as dateType
+from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 from typing import Any

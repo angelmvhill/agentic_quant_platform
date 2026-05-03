@@ -147,10 +147,7 @@ class BaseForecaster(Serializable, ABC):
         """
         if isinstance(fh, pd.DatetimeIndex):
             return fh
-        if isinstance(fh, int):
-            offsets = list(range(1, fh + 1))
-        else:
-            offsets = list(fh)
+        offsets = list(range(1, fh + 1)) if isinstance(fh, int) else list(fh)
         if last_index is not None and freq is not None:
             try:
                 step = pd.tseries.frequencies.to_offset(freq)

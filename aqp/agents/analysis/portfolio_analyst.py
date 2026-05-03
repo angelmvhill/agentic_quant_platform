@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a portfolio analyst. Inputs: positions, recent fills, ledger
 balance over time, exposure breakdown. Output JSON:
 

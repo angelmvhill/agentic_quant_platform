@@ -117,7 +117,7 @@ def compute_technical_snapshot(
         ema12.update(price)
         # ATR wants full BarData-like fields; build a dict-adapter.
         try:
-            from aqp.core.types import BarData, Interval, Symbol
+            from aqp.core.types import BarData, Interval
 
             sym = _safe_symbol(vt_symbol)
             bar = BarData(

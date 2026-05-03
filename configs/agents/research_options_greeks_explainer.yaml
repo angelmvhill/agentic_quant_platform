@@ -11,7 +11,7 @@ system_prompt: |
   gamma, theta, vega, vanna, and volga sensitivities.
 model:
   provider: ollama
-  model: nemotron:latest
+  model: ""
   tier: quick
   temperature: 0.2
 tools:

@@ -12,8 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from decimal import Decimal
-from functools import lru_cache
-
+from functools import cache
 
 # ---------------------------------------------------------------------------
 # Currency
@@ -94,7 +93,7 @@ USDT = _cur("USDT", 6, name="Tether", is_fiat=False, is_crypto=True)
 USDC = _cur("USDC", 6, name="USD Coin", is_fiat=False, is_crypto=True)
 
 
-@lru_cache(maxsize=None)
+@cache
 def currency_of(code: str) -> Currency:
     """Lookup/construct a :class:`Currency` for an ISO/crypto code.
 

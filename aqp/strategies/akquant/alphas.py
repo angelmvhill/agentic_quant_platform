@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 from aqp.core.registry import register
@@ -140,7 +139,7 @@ class TimerMomentumRotationAlpha(MomentumRotationAlpha):
 
 
 from aqp.core.interfaces import IStrategy
-from aqp.core.types import BarData, OrderData, OrderRequest
+from aqp.core.types import BarData, OrderData
 
 
 @register("GridTradingStrategy", source="akquant", category="grid")

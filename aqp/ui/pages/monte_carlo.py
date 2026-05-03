@@ -20,7 +20,6 @@ import solara
 from aqp.ui.api_client import get, post
 from aqp.ui.components import (
     EntityTable,
-    MetricTile,
     StatsGrid,
     TaskStreamer,
     use_api,

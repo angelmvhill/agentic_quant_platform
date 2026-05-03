@@ -19,13 +19,8 @@ lines and the parts are swappable.
 """
 from __future__ import annotations
 
-import contextlib
-import difflib
-import json
-from datetime import datetime
 from typing import Any
 
-import pandas as pd
 import solara
 import yaml
 
@@ -43,7 +38,6 @@ from aqp.ui.components import (
     use_api,
 )
 from aqp.ui.layout.page_header import PageHeader
-
 
 # ---------------------------------------------------------------------------
 # Static catalogs — adding an entry here surfaces a new component in the UI.
@@ -573,7 +567,7 @@ def _selected_summary(detail: dict[str, Any]) -> None:
         MetricTile("Version", f"v{version}")
         MetricTile("Status", status, tone=_status_tone(detail.get("status")))
         MetricTile("Last Sharpe", last)
-        MetricTile("Tests", len((detail.get("tests") or [])))
+        MetricTile("Tests", len(detail.get("tests") or []))
 
 
 # ---------------------------------------------------------------------------
@@ -602,11 +596,10 @@ def _build_tab(
 ) -> None:
     engine_description = ENGINES[engine.value]["description"]
     with solara.Column(gap="16px"):
-        with solara.Card("Run basics"):
-            with solara.Row(gap="10px", style={"flex-wrap": "wrap"}):
-                solara.InputText("run_name", value=run_name)
-                solara.InputText("initial_cash (USD)", value=initial_cash)
-                solara.InputText("rebalance_every (bars)", value=rebalance_every)
+        with solara.Card("Run basics"), solara.Row(gap="10px", style={"flex-wrap": "wrap"}):
+            solara.InputText("run_name", value=run_name)
+            solara.InputText("initial_cash (USD)", value=initial_cash)
+            solara.InputText("rebalance_every (bars)", value=rebalance_every)
         with solara.Card("Data inputs"):
             solara.Select(
                 label="Data source",

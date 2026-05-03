@@ -7,7 +7,6 @@ from typing import Any
 from aqp.agents.financial.base import BaseFinancialCrew, FinancialReport
 from aqp.core.registry import agent
 
-
 _SYSTEM = """\
 You are a FinRobot Market Forecaster. Given recent prices, fundamentals
 and a news digest, produce next-week, next-month, and next-quarter

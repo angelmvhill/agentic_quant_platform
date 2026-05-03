@@ -17,14 +17,14 @@ still build their own ``overlays`` list and hand them to
 from __future__ import annotations
 
 import contextlib
-from dataclasses import dataclass, field
-from typing import Iterable
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
 import solara
 
-from aqp.ui.theme import CANDLE_COLORS, PALETTE, apply_theme, plotly_template
+from aqp.ui.theme import CANDLE_COLORS, PALETTE, plotly_template
 
 
 @dataclass

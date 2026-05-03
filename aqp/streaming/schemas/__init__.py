@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import io
 import json
-from functools import lru_cache
+from functools import cache, lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -75,7 +75,7 @@ def schema_for_topic(topic: str) -> str:
         raise KeyError(f"Unknown topic: {topic!r}") from exc
 
 
-@lru_cache(maxsize=None)
+@cache
 def load_schema(schema_name: str) -> dict[str, Any]:
     """Load and cache the parsed Avro schema for ``schema_name``."""
     path = SCHEMAS_DIR / f"{schema_name}.avsc"
@@ -85,7 +85,7 @@ def load_schema(schema_name: str) -> dict[str, Any]:
         return json.load(fh)
 
 
-@lru_cache(maxsize=None)
+@cache
 def _parsed_schema(schema_name: str) -> Any:
     """Return a ``fastavro``-parsed schema object (lazy import)."""
     try:

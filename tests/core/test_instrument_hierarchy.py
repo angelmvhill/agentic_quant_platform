@@ -13,13 +13,13 @@ from aqp.core.domain.enums import (
 )
 from aqp.core.domain.identifiers import InstrumentId, Symbol2, Venue
 from aqp.core.domain.instrument import (
+    ETF,
     BettingInstrument,
     Bond,
     Cfd,
     Commodity,
     CryptoPerpetual,
     CurrencyPair,
-    ETF,
     Equity,
     FuturesContract,
     IndexInstrument,

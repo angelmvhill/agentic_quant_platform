@@ -32,19 +32,17 @@ from aqp.ui.pages import agentic_wizard as agentic_wizard_page
 from aqp.ui.pages import api_playground as api_playground_page
 from aqp.ui.pages import backtest as backtest_page
 from aqp.ui.pages import chat as chat_page
+from aqp.ui.pages import credentials as credentials_page
 from aqp.ui.pages import crew_trace as crew_trace_page
 from aqp.ui.pages import dash_embed as dash_page
 from aqp.ui.pages import dashboard_home as dashboard_page
 from aqp.ui.pages import data as data_page
 from aqp.ui.pages import data_browser as data_browser_page
-from aqp.ui.pages import credentials as credentials_page
 from aqp.ui.pages import factor_workbench as factor_workbench_page
 from aqp.ui.pages import fred as fred_page
 from aqp.ui.pages import gdelt as gdelt_page
 from aqp.ui.pages import indicator_builder as indicator_builder_page
 from aqp.ui.pages import live_market as live_market_page
-from aqp.ui.pages import sec as sec_page
-from aqp.ui.pages import sources as sources_page
 from aqp.ui.pages import ml_model_detail as ml_model_detail_page
 from aqp.ui.pages import ml_training as ml_training_page
 from aqp.ui.pages import monte_carlo as monte_carlo_page
@@ -52,6 +50,8 @@ from aqp.ui.pages import optimizer as optimizer_page
 from aqp.ui.pages import paper_runs as paper_runs_page
 from aqp.ui.pages import portfolio as portfolio_page
 from aqp.ui.pages import rl as rl_page
+from aqp.ui.pages import sec as sec_page
+from aqp.ui.pages import sources as sources_page
 from aqp.ui.pages import strategy as strategy_page
 from aqp.ui.pages import strategy_browser as strategy_browser_page
 

@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import logging
 import threading
-from collections.abc import Iterable
 from pathlib import Path
 
 from aqp.agents.spec import AgentSpec, load_specs_from_dir

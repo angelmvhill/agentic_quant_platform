@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import pandas as pd
@@ -105,7 +105,7 @@ def run_agentic_pipeline(
                 "symbols": v_symbols,
                 "conditions": conds,
                 "universe_filter": ufilter,
-                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "generated_at": datetime.now(UTC).isoformat(),
             }
         )
 

@@ -20,11 +20,9 @@ try:
     from ib_async import Stock as _IBStock
     from ib_async import StopLimitOrder as _IBStopLimit
     from ib_async import StopOrder as _IBStop
-except ImportError as exc:  # pragma: no cover — optional
-    raise ImportError(
-        'InteractiveBrokersBrokerage requires the "ibkr" extra. '
-        'Install with: pip install -e ".[ibkr]"'
-    ) from exc
+except ImportError:  # pragma: no cover — optional
+    IB = None  # type: ignore[assignment]
+    _IBLimit = _IBMarket = _IBStock = _IBStopLimit = _IBStop = None  # type: ignore[assignment]
 
 from aqp.config import settings
 from aqp.core.registry import register
@@ -76,6 +74,11 @@ class InteractiveBrokersBrokerage(BaseAsyncBrokerage):
         readonly: bool = False,
     ) -> None:
         super().__init__()
+        if IB is None:
+            raise ImportError(
+                'InteractiveBrokersBrokerage requires the "ibkr" extra. '
+                'Install with: pip install -e ".[ibkr]"'
+            )
         self.host = host or settings.ibkr_host
         self.port = int(port if port is not None else settings.ibkr_port)
         self.client_id = int(client_id if client_id is not None else settings.ibkr_client_id)
@@ -107,7 +110,7 @@ class InteractiveBrokersBrokerage(BaseAsyncBrokerage):
                 timeout=self.connect_timeout,
                 readonly=self.readonly,
             )
-        except (asyncio.TimeoutError, ConnectionError, OSError) as exc:
+        except (TimeoutError, ConnectionError, OSError) as exc:
             raise ConnectionError(
                 f"IB Gateway at {self.host}:{self.port} not reachable "
                 f"(clientId={self.client_id}): {exc}. "

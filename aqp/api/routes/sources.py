@@ -15,6 +15,7 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any
 
+import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -94,32 +95,27 @@ class _AlphaVantageProbeAdapter:
     env_key = "AQP_ALPHA_VANTAGE_API_KEY"
 
     def probe(self) -> ProbeResult:
-        from aqp.data.sources.alpha_vantage import AlphaVantageClient
-        from aqp.data.sources.alpha_vantage._errors import RateLimitError
-
         started = perf_counter()
+        api_key = os.environ.get(self.env_key) or settings.alpha_vantage_api_key
+        if not api_key:
+            return ProbeResult.failure(f"missing {self.env_key}")
         try:
-            client = AlphaVantageClient()
-            try:
-                quote = client.timeseries.global_quote(self.symbol)
-            finally:
-                client.close()
-        except RateLimitError as exc:
-            return ProbeResult.success(
-                "alpha_vantage reachable (rate limited)",
-                latency_ms=round((perf_counter() - started) * 1000.0, 2),
-                note=str(exc),
-                retry_after_seconds=getattr(exc, "retry_after_seconds", None),
-            )
+            with httpx.Client(timeout=settings.alpha_vantage_timeout_seconds) as client:
+                response = client.get(
+                    settings.alpha_vantage_base_url,
+                    params={"function": "GLOBAL_QUOTE", "symbol": self.symbol, "apikey": api_key},
+                )
+                response.raise_for_status()
+                payload = response.json()
         except Exception as exc:
             return ProbeResult.failure(f"alpha_vantage probe failed: {exc}")
+        quote = payload.get("Global Quote") if isinstance(payload, dict) else None
         latency_ms = round((perf_counter() - started) * 1000.0, 2)
-        payload = quote.model_dump()
-        if payload:
+        if isinstance(quote, dict):
             return ProbeResult.success(
                 "alpha_vantage reachable",
                 latency_ms=latency_ms,
-                symbol=payload.get("symbol") or self.symbol,
+                symbol=quote.get("01. symbol") or self.symbol,
             )
         return ProbeResult.failure("unexpected alpha_vantage response payload", latency_ms=latency_ms)
 
@@ -308,7 +304,7 @@ def list_credentials() -> CredentialsResponse:
     index = _credential_key_index()
     entries: list[CredentialEntry] = []
     for key in sorted(index):
-        value = str(os.environ.get(key, env_values.get(key, "")) or "")
+        value = str(os.environ.get(key) or env_values.get(key, "") or "")
         entries.append(
             CredentialEntry(
                 key=key,

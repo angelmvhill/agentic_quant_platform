@@ -15,7 +15,7 @@ pipelines can resolve it by name.
 from __future__ import annotations
 
 import logging
-from typing import Iterable
+from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
@@ -61,14 +61,8 @@ def apply_triple_barrier(
     exit.
     """
     out = events[["t1"]].copy()
-    if pt_sl[0] > 0:
-        pt = pt_sl[0] * events["trgt"]
-    else:
-        pt = pd.Series(np.nan, index=events.index)
-    if pt_sl[1] > 0:
-        sl = -pt_sl[1] * events["trgt"]
-    else:
-        sl = pd.Series(np.nan, index=events.index)
+    pt = pt_sl[0] * events["trgt"] if pt_sl[0] > 0 else pd.Series(np.nan, index=events.index)
+    sl = -pt_sl[1] * events["trgt"] if pt_sl[1] > 0 else pd.Series(np.nan, index=events.index)
 
     for loc, vertical in events["t1"].fillna(close.index[-1]).items():
         df0 = close.loc[loc:vertical]

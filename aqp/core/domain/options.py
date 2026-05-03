@@ -7,7 +7,8 @@ to publish and query live option chains.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date as dateType, datetime
+from datetime import date as dateType
+from datetime import datetime
 from decimal import Decimal
 
 from aqp.core.domain.greeks import OptionGreekValues

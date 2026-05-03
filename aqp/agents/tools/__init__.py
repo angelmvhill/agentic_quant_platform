@@ -13,7 +13,6 @@ from __future__ import annotations
 import sys
 import types
 
-
 try:  # pragma: no cover - exercised when CrewAI is installed.
     from crewai.tools import BaseTool as _CrewAIBaseTool  # noqa: F401
 except ImportError:  # pragma: no cover - cold Python 3.14 dev install.
@@ -66,7 +65,6 @@ from aqp.agents.tools.sentiment_tool import SentimentScoreTool
 from aqp.agents.tools.simulation_tool import InsightImpactTool
 from aqp.agents.tools.technical_tool import TechnicalTool
 from aqp.agents.tools.volatility_tool import HistoricalVolatilityTool
-
 
 TOOL_REGISTRY: dict[str, type] = {
     # Existing tools (kept for backwards compat with current crews)

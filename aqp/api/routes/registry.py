@@ -225,7 +225,8 @@ def _summary_for(alias: str, cls: type, kind: str) -> ComponentSummary:
 @router.get("/kinds")
 def list_kinds() -> dict[str, Any]:
     """Return every populated component-kind plus a count of registered classes per kind."""
-    from aqp.core.registry import list_by_kind, list_kinds as _list_kinds
+    from aqp.core.registry import list_by_kind
+    from aqp.core.registry import list_kinds as _list_kinds
 
     kinds = _list_kinds()
     return {

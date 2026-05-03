@@ -44,7 +44,7 @@ class FetcherCatalog:
         # We keep the public surface list[type[Fetcher]]; priority is sidecar.
         bucket.append(fetcher)
         # Annotate so the priority is discoverable without a second dict.
-        setattr(fetcher, "_catalog_priority", priority)
+        fetcher._catalog_priority = priority
         bucket.sort(key=lambda f: getattr(f, "_catalog_priority", 0), reverse=True)
 
     def get(self, domain_path: str) -> list[type[Fetcher]]:

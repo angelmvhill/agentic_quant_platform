@@ -1,7 +1,7 @@
 agent:
   crew: tradingagents
   provider: ollama
-  model: nemotron:latest
+  model: ""
   max_debate_rounds: 2
   cache_decisions: true
   cache_ttl_hours: 24

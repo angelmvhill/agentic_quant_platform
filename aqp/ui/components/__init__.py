@@ -15,15 +15,15 @@ continue to work unchanged.
 """
 
 from aqp.ui.components.agent_trace import AgentTrace
-from aqp.ui.components.chat_message import ChatBubble
 from aqp.ui.components.charts.candlestick import (
+    SUPPORTED_CHART_FEATURES,
     Candlestick,
     IndicatorOverlay,
-    SUPPORTED_CHART_FEATURES,
     build_security_figure,
 )
 from aqp.ui.components.charts.heatmap import Heatmap
 from aqp.ui.components.charts.stats_grid import StatsGrid
+from aqp.ui.components.chat_message import ChatBubble
 from aqp.ui.components.data.entity_table import EntityTable
 from aqp.ui.components.data.equity_card import EquityCard
 from aqp.ui.components.data.metric_tile import MetricTile, TileTrend

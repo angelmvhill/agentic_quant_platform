@@ -251,7 +251,7 @@ export function CatalogTableDetail({ namespace, name }: CatalogTableDetailProps)
     }
   }
 
-  const queryColumns = queryResult?.columns ?? [];
+  const queryColumns = useMemo(() => queryResult?.columns ?? [], [queryResult]);
   const numericColumns = useMemo(() => {
     if (!queryResult) return [] as string[];
     return queryResult.columns.filter((c) =>

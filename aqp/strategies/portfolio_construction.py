@@ -178,7 +178,7 @@ class BasicHRP(IPortfolioConstructionModel):
         if not signals:
             return []
         try:
-            from scipy.cluster.hierarchy import linkage, fcluster  # noqa: F401
+            from scipy.cluster.hierarchy import fcluster, linkage  # noqa: F401
             from scipy.spatial.distance import squareform
         except ImportError:
             logger.warning("scipy not available; falling back to equal weights")
@@ -228,7 +228,6 @@ class BasicHRP(IPortfolioConstructionModel):
         link = link.astype(int)
         last = link[-1, 0:2].tolist()
         order = list(last)
-        cur = n
         while max(order) >= n:
             order_new = []
             for item in order:

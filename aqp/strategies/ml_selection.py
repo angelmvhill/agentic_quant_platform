@@ -21,7 +21,8 @@ Two surfaces:
 from __future__ import annotations
 
 import logging
-from typing import Any, Iterable, Literal
+from collections.abc import Iterable
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -215,7 +216,7 @@ def _allocate_weights(
         weights = _risk_parity_weights(cov)
     else:  # min_variance
         weights = _min_variance_weights(cov, max_weight=max_weight)
-    out = {sym: float(w) for sym, w in zip(syms, weights)}
+    out = {sym: float(w) for sym, w in zip(syms, weights, strict=False)}
     # If some selected symbols dropped due to NaNs, fill them with 0.
     for s in selected:
         out.setdefault(s, 0.0)
@@ -309,7 +310,7 @@ class MLStockSelectionAlpha(IAlphaModel):
             return [], {}
         scored = scored.sort_values("score", ascending=False)
         selected = scored["vt_symbol"].tolist()
-        return selected, dict(zip(scored["vt_symbol"], scored["score"]))
+        return selected, dict(zip(scored["vt_symbol"], scored["score"], strict=False))
 
     # ----------------------------------------- IAlphaModel.generate_signals --
 
@@ -351,7 +352,7 @@ class MLStockSelectionAlpha(IAlphaModel):
         if latest.empty:
             return []
         # Keep preds aligned to the filtered ``latest``.
-        symbol_to_pred = dict(zip(latest["vt_symbol"], preds[: len(latest)]))
+        symbol_to_pred = dict(zip(latest["vt_symbol"], preds[: len(latest)], strict=False))
         latest_preds = np.array([symbol_to_pred[s] for s in latest["vt_symbol"]])
         selected, scores = self._select(latest, latest_preds)
         if not selected:
@@ -515,7 +516,7 @@ class SectorNeutralMLAlpha(MLStockSelectionAlpha):
         if ts is None and not bars.empty:
             ts = pd.to_datetime(bars["timestamp"]).max()
         out: list[Signal] = []
-        scores = dict(zip(kept["vt_symbol"], kept["score"]))
+        scores = dict(zip(kept["vt_symbol"], kept["score"], strict=False))
         for sym, w in weights.items():
             if w <= 0:
                 continue

@@ -6,8 +6,7 @@ the platform's canonical schema are the *same type*.
 """
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
-from decimal import Decimal
+from datetime import date as dateType
 
 from pydantic import Field, field_validator
 

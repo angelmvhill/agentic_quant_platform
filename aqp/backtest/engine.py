@@ -32,10 +32,6 @@ from aqp.backtest.interrupts import (
 )
 from aqp.backtest.metrics import summarise
 from aqp.core.interfaces import (
-    IAlphaModel,
-    IExecutionModel,
-    IPortfolioConstructionModel,
-    IRiskManagementModel,
     IStrategy,
 )
 from aqp.core.registry import register

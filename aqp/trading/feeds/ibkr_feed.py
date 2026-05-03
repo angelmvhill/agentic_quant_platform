@@ -10,11 +10,9 @@ from typing import Any
 try:
     from ib_async import IB  # type: ignore[import]
     from ib_async import Stock as _IBStock
-except ImportError as exc:  # pragma: no cover — optional
-    raise ImportError(
-        'IBKRDataFeed requires the "ibkr" extra. '
-        'Install with: pip install -e ".[ibkr]"'
-    ) from exc
+except ImportError:  # pragma: no cover — optional
+    IB = None  # type: ignore[assignment]
+    _IBStock = None  # type: ignore[assignment]
 
 from aqp.config import settings
 from aqp.core.registry import register
@@ -42,6 +40,11 @@ class IBKRDataFeed(BaseFeed):
         connect_timeout: float = 8.0,
     ) -> None:
         super().__init__()
+        if IB is None:
+            raise ImportError(
+                'IBKRDataFeed requires the "ibkr" extra. '
+                'Install with: pip install -e ".[ibkr]"'
+            )
         self.host = host or settings.ibkr_host
         self.port = int(port if port is not None else settings.ibkr_port)
         # Use a dedicated client_id offset so the feed doesn't collide with

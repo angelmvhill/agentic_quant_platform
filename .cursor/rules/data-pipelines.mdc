@@ -37,8 +37,8 @@ sequences them; aggregate output is `IngestionReport`.
 1. Iceberg writes go through `iceberg_catalog.append_arrow` (and
    `create_or_replace_table`). Never call PyIceberg's
    `Catalog.create_table` / `Table.append` directly.
-2. The Director is a Nemotron LLM call by default
-   (`AQP_LLM_DIRECTOR_MODEL=nemotron-3-nano:30b`). It must always
+2. The Director is an Ollama LLM call by default
+   (`AQP_LLM_DIRECTOR_MODEL=qwen2.5:7b`). It must always
    produce an `IngestionPlan` — when the LLM is unreachable / returns
    garbage / is disabled, fall back to the deterministic
    `_identity_plan` in

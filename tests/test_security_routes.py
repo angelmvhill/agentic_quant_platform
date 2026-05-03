@@ -12,7 +12,6 @@ from fastapi.testclient import TestClient
 
 from aqp.data import cache as cache_mod
 
-
 # --------------------------------------------------------------------------
 # In-memory stand-ins (shared with the cache module tests).
 # --------------------------------------------------------------------------
@@ -153,8 +152,8 @@ class _StubSource:
 def stub_source(monkeypatch: pytest.MonkeyPatch) -> _StubSource:
     stub = _StubSource()
 
-    from aqp.data import ingestion as ingestion_mod
     from aqp.data import fundamentals as fundamentals_mod
+    from aqp.data import ingestion as ingestion_mod
 
     class _Factory:
         def __new__(cls, *args, **kwargs):  # noqa: ARG002

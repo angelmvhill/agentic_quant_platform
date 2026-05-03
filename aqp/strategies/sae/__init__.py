@@ -7,7 +7,6 @@ from aqp.strategies.sae.alphas import (
     StockAnalysisEngineAdapterStrategy,
 )
 
-
 __all__ = [
     "IndicatorVoteAlpha",
     "OptionSpreadStrategy",

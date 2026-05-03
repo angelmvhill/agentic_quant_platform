@@ -62,16 +62,13 @@ def _markowitz_overlay(
         ones = np.ones(len(syms_cov))
         raw = inv @ ones
         denom = ones @ raw
-        if denom == 0:
-            mv = np.ones(len(syms_cov)) / len(syms_cov)
-        else:
-            mv = raw / denom
+        mv = np.ones(len(syms_cov)) / len(syms_cov) if denom == 0 else raw / denom
         mv = np.clip(mv, 0.0, 1.0)
         mv = mv / mv.sum() if mv.sum() > 0 else np.ones(len(syms_cov)) / len(syms_cov)
     except Exception:
         logger.exception("fundamental_drl: min-variance blend failed")
         return drl_weights
-    mv_map = dict(zip(syms_cov, mv))
+    mv_map = dict(zip(syms_cov, mv, strict=False))
     blended = {}
     for sym in syms:
         drl_w = float(drl_weights.get(sym, 0.0))
@@ -151,7 +148,7 @@ def train_fundamental_portfolio_drl(
         if action.size and action.sum() > 0:
             action = action / action.sum()
         if action.size == len(symbols):
-            drl_weights = {sym: float(w) for sym, w in zip(symbols, action)}
+            drl_weights = {sym: float(w) for sym, w in zip(symbols, action, strict=False)}
             provider = DuckDBHistoryProvider()
             bars = provider.get_bars(
                 [Symbol.parse(s) for s in symbols],

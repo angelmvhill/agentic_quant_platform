@@ -38,7 +38,6 @@ from aqp.core.domain.enums import (
 )
 from aqp.core.domain.identifiers import InstrumentId, TradeId
 
-
 # ---------------------------------------------------------------------------
 # Bar descriptors
 # ---------------------------------------------------------------------------

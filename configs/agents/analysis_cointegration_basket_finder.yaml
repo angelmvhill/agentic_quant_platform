@@ -10,7 +10,7 @@ system_prompt: |
   hedge_ratio and half_life for each.
 model:
   provider: ollama
-  model: nemotron:latest
+  model: ""
   tier: deep
   temperature: 0.1
 tools:

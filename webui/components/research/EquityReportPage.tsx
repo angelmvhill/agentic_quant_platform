@@ -28,7 +28,7 @@ import { apiFetch } from "@/lib/api/client";
 import { useApiQuery } from "@/lib/api/hooks";
 import { useChatStream } from "@/lib/ws";
 
-const { Text, Title, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 interface EquitySection {
   section_key?: string;

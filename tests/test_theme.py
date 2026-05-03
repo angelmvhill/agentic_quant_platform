@@ -13,7 +13,6 @@ from aqp.ui.theme import (
     plotly_template,
 )
 
-
 _AA_NORMAL = 4.5  # WCAG 2.1 AA for normal text
 _AA_LARGE = 3.0   # WCAG 2.1 AA for large / bold text
 

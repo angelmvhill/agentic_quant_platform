@@ -37,9 +37,9 @@ def health() -> HealthResponse:
     except Exception:
         logger.exception("postgres health probe failed")
     try:
-        from aqp.data.chroma_store import ChromaStore
+        from aqp.data.chroma_store import _client
 
-        ChromaStore()
+        _client().heartbeat()
         chroma_ok = True
     except Exception:
         logger.exception("chromadb health probe failed")

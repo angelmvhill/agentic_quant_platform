@@ -57,12 +57,6 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react").then((m) => m.
 
 const { Text, Paragraph, Title } = Typography;
 
-interface JudgeListItem {
-  alias: string;
-  qualname: string;
-  tags: string[];
-}
-
 interface SubmitResp {
   task_id: string;
   stream_url?: string;

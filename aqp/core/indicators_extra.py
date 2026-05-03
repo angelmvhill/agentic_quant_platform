@@ -39,7 +39,6 @@ import numpy as np
 from aqp.core.indicators import IndicatorBase
 from aqp.core.types import BarData
 
-
 # ---------------------------------------------------------------------------
 # Momentum oscillators (KST, Coppock, Fisher, MassIndex)
 # ---------------------------------------------------------------------------
@@ -227,10 +226,7 @@ class FRAMA(IndicatorBase[BarData]):
         n1 = (h1 - l1) / (n / 2) if (n / 2) > 0 else 0
         n2 = (h2 - l2) / (n / 2) if (n / 2) > 0 else 0
         n3 = (h_total - l_total) / n if n > 0 else 0
-        if n1 + n2 <= 0 or n3 <= 0:
-            d = 1.0
-        else:
-            d = (math.log(n1 + n2) - math.log(n3)) / math.log(2)
+        d = 1.0 if n1 + n2 <= 0 or n3 <= 0 else (math.log(n1 + n2) - math.log(n3)) / math.log(2)
         alpha = math.exp(-self.fc * (d - 1))
         alpha = max(2.0 / (self.sc + 1), min(alpha, 1.0))
         if math.isnan(self._frama):

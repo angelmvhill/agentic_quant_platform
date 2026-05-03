@@ -45,7 +45,7 @@ from aqp.agents.graph.decision_log import (
     append_pending_decision,
     resolve_pending_decisions,
 )
-from aqp.agents.graph.state import AgentState, RiskDebateState, ResearchDebateState
+from aqp.agents.graph.state import AgentState, ResearchDebateState, RiskDebateState
 
 __all__ = [
     "AgentState",

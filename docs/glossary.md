@@ -148,9 +148,8 @@ mismatch between this glossary and the code, file an issue.
   prefix, env-var name, default models).
 - **`vllm` provider** — OpenAI-compatible vLLM endpoint behind LiteLLM's
   `openai/` adapter. Empty `AQP_VLLM_BASE_URL` disables.
-- **`nemotron-3-nano:30b`** — Default Director model on Ollama
-  (NVIDIA Nemotron Nano v3, 31.6B params). Pull with
-  `ollama pull nemotron-3-nano:30b`. Configurable via
+- **`qwen2.5:7b`** — Default deep and Director model on Ollama.
+  Pull with `ollama pull qwen2.5:7b`. Configurable via
   `AQP_LLM_DIRECTOR_MODEL`.
 
 ## Streaming + live

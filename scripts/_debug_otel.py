@@ -3,10 +3,9 @@ from __future__ import annotations
 
 
 def main() -> None:
-    import aqp.api.main as main_module  # noqa: F401 — triggers module-level init
-
     from opentelemetry import trace
 
+    import aqp.api.main as main_module  # noqa: F401 — triggers module-level init
     from aqp.observability.tracing import _instrumented, _tracer_provider
 
     provider = trace.get_tracer_provider()

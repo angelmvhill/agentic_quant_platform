@@ -337,10 +337,9 @@ CLI cheat sheet, and API reference.
 - [Ollama](https://ollama.com/) running locally (for the LLM). Ollama runs **natively on the host** so it can access the GPU.
 
 ```bash
-# Pull your preferred model. Default is nemotron:latest, but any Ollama model works.
-ollama pull nemotron
-# Or a lighter model for smaller GPUs:
+# Pull the default local models.
 ollama pull llama3.2
+ollama pull qwen2.5:7b
 ```
 
 ### 2. Clone and configure

@@ -68,7 +68,11 @@ with contextlib.suppress(Exception):  # pragma: no cover
 with contextlib.suppress(Exception):  # pragma: no cover
     from aqp.ml.models import sae as _sae_ml_pkg  # noqa: F401
 with contextlib.suppress(Exception):  # pragma: no cover
-    from aqp.ml.walk_forward import WalkForwardSplitter, WalkForwardTrainer, SimpleSliceDataset  # noqa: F401
+    from aqp.ml.walk_forward import (  # noqa: F401
+        SimpleSliceDataset,
+        WalkForwardSplitter,
+        WalkForwardTrainer,
+    )
 
 __all__ = [
     "BaseModel",

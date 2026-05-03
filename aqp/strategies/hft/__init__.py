@@ -9,13 +9,12 @@ Calling ``run()`` on any of them today raises ``NotImplementedError``.
 from __future__ import annotations
 
 from aqp.strategies.hft.alphas import (
-    BasisAlphaMM,
     GLFTMM,
+    BasisAlphaMM,
     GridMM,
     ImbalanceAlphaMM,
     QueueAwareMM,
 )
-
 
 __all__ = [
     "BasisAlphaMM",

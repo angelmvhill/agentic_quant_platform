@@ -7,9 +7,11 @@ account dependency.
 """
 from __future__ import annotations
 
+import contextlib
 import logging
+from collections.abc import Iterable
 from datetime import datetime, timedelta
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -191,10 +193,8 @@ def compute_pnl_series(
     fills = fills.sort_values("created_at").copy()
     # Strip timezone info so subsequent timestamp comparisons stay consistent.
     if pd.api.types.is_datetime64_any_dtype(fills["created_at"]):
-        try:
+        with contextlib.suppress(TypeError, AttributeError):
             fills["created_at"] = fills["created_at"].dt.tz_localize(None)
-        except (TypeError, AttributeError):
-            pass
     fills["day"] = fills["created_at"].dt.normalize()
     fills["signed_qty"] = fills.apply(
         lambda r: float(r["quantity"]) if r["side"] == "buy" else -float(r["quantity"]),

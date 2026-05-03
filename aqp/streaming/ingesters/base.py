@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from abc import ABC, abstractmethod
@@ -113,10 +114,8 @@ class BaseIngester(ABC):
                 self.metrics.errors += 1
                 self.metrics.mark_connected(False)
                 self.metrics.mark_reconnect()
-                try:
+                with contextlib.suppress(TimeoutError):
                     await asyncio.wait_for(self._stop_event.wait(), timeout=backoff)
-                except asyncio.TimeoutError:
-                    pass
                 backoff = min(backoff * 2, max_backoff_sec)
                 continue
             # Clean exit from _run_once (e.g. test completion).

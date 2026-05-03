@@ -24,7 +24,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import AsyncIterator, Iterable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 try:
@@ -37,7 +37,17 @@ except ImportError as exc:  # pragma: no cover - optional
 
 from aqp.config import settings
 from aqp.core.registry import register
-from aqp.core.types import BarData, Direction, Exchange, Interval, QuoteBar, Signal, Symbol, TickData, TickType
+from aqp.core.types import (
+    BarData,
+    Direction,
+    Exchange,
+    Interval,
+    QuoteBar,
+    Signal,
+    Symbol,
+    TickData,
+    TickType,
+)
 from aqp.streaming.schemas import avro_decode, schema_for_topic, topic_for
 from aqp.trading.feeds.base import BaseFeed
 
@@ -48,8 +58,8 @@ EmitAs = Literal["bar", "quote", "tick", "signal"]
 
 def _ns_to_dt(ns: int | None) -> datetime:
     if not ns:
-        return datetime.now(timezone.utc)
-    return datetime.fromtimestamp(ns / 1_000_000_000, tz=timezone.utc)
+        return datetime.now(UTC)
+    return datetime.fromtimestamp(ns / 1_000_000_000, tz=UTC)
 
 
 def _parse_vt(vt: str) -> Symbol:

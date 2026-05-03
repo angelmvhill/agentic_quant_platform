@@ -13,7 +13,8 @@ Four simulator families covered:
 from __future__ import annotations
 
 import logging
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -173,7 +174,7 @@ def portfolio_return_percentiles(
 
     finals = []
     initials = []
-    for sym, frame in price_paths.items():
+    for _sym, frame in price_paths.items():
         finals.append(frame.iloc[-1].values)
         initials.append(float(frame.iloc[0, 0]))
     finals = np.stack(finals)  # (n_assets, n_paths)

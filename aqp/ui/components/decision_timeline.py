@@ -86,7 +86,7 @@ def DecisionTimeline(backtest_id: str | None, limit: int = 500) -> None:
         solara.Info("Submit a backtest to see the decision timeline.", dense=True)
         return
 
-    result = use_api(
+    result = use_api(  # noqa: SH101
         f"/agentic/decisions/{backtest_id}?limit={limit}",
         default=[],
     )

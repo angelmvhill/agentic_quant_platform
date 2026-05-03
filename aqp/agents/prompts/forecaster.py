@@ -14,8 +14,8 @@ empirically works for the FinGPT-Forecaster instruction-tuned models.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 EQUITY_PROMPT_END = (
     "\n\nBased on all the information before {start_date}, let's first analyze the "
@@ -50,10 +50,7 @@ def map_bin_label(bin_lb: str) -> str:
     """
     lb = str(bin_lb or "").replace("U", "up by ").replace("D", "down by ")
     lb = lb.replace("1", "0-1%").replace("2", "1-2%").replace("3", "2-3%").replace("4", "3-4%")
-    if lb.endswith("+"):
-        lb = lb.replace("5+", "more than 5%")
-    else:
-        lb = lb.replace("5", "4-5%")
+    lb = lb.replace("5+", "more than 5%") if lb.endswith("+") else lb.replace("5", "4-5%")
     return lb
 
 

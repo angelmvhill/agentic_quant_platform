@@ -309,10 +309,10 @@ def _write_sidecar(
     if not backtest_id:
         return
     try:
+
         from aqp.agents.trading.decision_cache import DecisionCache
         from aqp.persistence.db import get_session
         from aqp.persistence.models import AgentBacktest, AgentDecision
-        from sqlalchemy import func, select
 
         cache = DecisionCache(strategy_id=strategy_id)
         summary_df = cache.scan()
@@ -395,6 +395,8 @@ def run_agentic_judge(
     judge_cfg.setdefault("module_path", "aqp.backtest.llm_judge")
 
     try:
+        from sqlalchemy import select
+
         from aqp.backtest.llm_judge import BaseJudge, LLMJudge
         from aqp.core.registry import build_from_config
         from aqp.persistence.db import get_session
@@ -403,7 +405,6 @@ def run_agentic_judge(
             AgentJudgeReport,
             BacktestRun,
         )
-        from sqlalchemy import select
 
         with get_session() as session:
             run = session.get(BacktestRun, backtest_id)
@@ -504,6 +505,8 @@ def run_agentic_replay(
     :class:`AgenticAlpha` reads in ``PRECOMPUTE`` mode for the duration
     of the child backtest.
     """
+    from sqlalchemy import select
+
     from aqp.persistence.db import get_session
     from aqp.persistence.models import (
         AgentBacktest,
@@ -511,7 +514,6 @@ def run_agentic_replay(
         AgentReplayRun,
         BacktestRun,
     )
-    from sqlalchemy import select
 
     task_id = self.request.id or "local"
     emit(task_id, "start", f"Replaying backtest {parent_backtest_id}…")
@@ -598,6 +600,8 @@ def run_agentic_replay(
         from aqp.agents.trading.decision_cache import DecisionCache
         from aqp.agents.trading.types import (
             AgentDecision as AgentDecisionModel,
+        )
+        from aqp.agents.trading.types import (
             Rating5,
             TraderAction,
             parse_rating,

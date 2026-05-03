@@ -22,7 +22,7 @@ def Page() -> None:
         if not query.value.strip():
             return
         try:
-            payload = get(f"/fred/series/search", params={"q": query.value.strip(), "limit": 25})
+            payload = get("/fred/series/search", params={"q": query.value.strip(), "limit": 25})
             results.set(list(payload.get("results") or []))
             error.set("")
         except Exception as exc:  # pragma: no cover

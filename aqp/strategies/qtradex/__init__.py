@@ -10,8 +10,8 @@ from __future__ import annotations
 from aqp.strategies.qtradex.alphas import (
     AroonAlpha,
     AroonMfiVwapAlpha,
-    BBadXMacDrSiAlpha,
     BasicAlphaBase,
+    BBadXMacDrSiAlpha,
     BlackHoleAlpha,
     ClassicalCryptoAlpha,
     ConfluenceAlpha,
@@ -21,11 +21,11 @@ from aqp.strategies.qtradex.alphas import (
     EmaCrossHAAlpha,
     EmaCrossSMAAlpha,
     ExtinctionEventAlpha,
-    FRAMABotAlpha,
     Forty96Alpha,
+    FRAMABotAlpha,
     HeikinAshiIchimokuVortexAlpha,
-    IChingAlpha,
     IchimokuBotAlpha,
+    IChingAlpha,
     KSTIndicatorBotAlpha,
     LavaHKAlpha,
     MASabresAlpha,
@@ -37,7 +37,6 @@ from aqp.strategies.qtradex.alphas import (
     UltimateForecastMesaAlpha,
     VortexAlpha,
 )
-
 
 __all__ = [
     "AroonAlpha",

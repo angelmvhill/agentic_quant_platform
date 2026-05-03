@@ -45,8 +45,8 @@ with contextlib.suppress(Exception):
         ALSTMTSModel,
         GATsTSModel,
         GRUTSModel,
-        LSTMTSModel,
         LocalformerTSModel,
+        LSTMTSModel,
         TCNTSModel,
         TransformerTSModel,
     )

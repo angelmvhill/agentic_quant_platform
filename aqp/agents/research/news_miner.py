@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from aqp.agents.spec import AgentSpec, GuardrailSpec, MemorySpec, ModelRef, RAGRef, ToolRef
 
-
 SYSTEM = """You are a financial news mining analyst. Given a symbol or topic, you:
 1. Pull recent news + sentiment (use the news_digest and sentiment_score tools).
 2. Cross-check regulatory signals via regulatory_lookup and the third-order RAG.

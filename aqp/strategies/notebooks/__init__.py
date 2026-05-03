@@ -29,7 +29,6 @@ from aqp.strategies.notebooks.alphas import (
     OvernightReturnsAlpha,
 )
 
-
 __all__ = [
     "BaltasTrendAlpha",
     "BreakoutTrendAlpha",

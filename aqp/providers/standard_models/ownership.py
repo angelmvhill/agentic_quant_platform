@@ -1,20 +1,21 @@
 """Ownership standard models."""
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
+from datetime import date as dateType
 from decimal import Decimal
 
-from pydantic import Field, field_validator
+from pydantic import field_validator
 
 from aqp.core.domain.ownership import (
     EquityFtd as _EquityFtd,
+)
+from aqp.core.domain.ownership import (
     EquityOwnershipSnapshot,
     EquityPeerGroup,
     Form13FHolding,
     GovernmentTrade,
     InsiderTransaction,
     InstitutionalHolding,
-    SharesFloat,
     ShortInterest,
     TopRetail,
 )

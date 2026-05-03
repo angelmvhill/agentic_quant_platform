@@ -209,7 +209,7 @@ class CatalogRowSnapshot:
     updated_at: datetime | None = None
 
     @classmethod
-    def from_orm(cls, row: DatasetCatalog) -> "CatalogRowSnapshot":
+    def from_orm(cls, row: DatasetCatalog) -> CatalogRowSnapshot:
         return cls(
             id=getattr(row, "id", None),
             description=getattr(row, "description", None),

@@ -6,7 +6,6 @@ from typing import Any
 from aqp.agents.financial.equity_sections.section_base import BaseSectionAgent
 from aqp.core.registry import register
 
-
 _SYSTEM = """\
 You are an equity risk analyst. Produce 4-6 succinct bullet risks for
 the named ticker, drawing on the fundamentals + news digest. Cover:

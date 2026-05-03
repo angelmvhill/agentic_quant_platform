@@ -1,9 +1,8 @@
 """Crypto historical prices + search."""
 from __future__ import annotations
 
-from datetime import date as dateType, datetime
-
-from pydantic import Field
+from datetime import date as dateType
+from datetime import datetime
 
 from aqp.providers.base import Data, QueryParams
 

@@ -39,12 +39,11 @@ from aqp.core.domain.identifiers import (
     OrderListId,
     PositionId,
     StrategyId,
-    TraderId,
     TradeId,
+    TraderId,
     VenueOrderId,
 )
 from aqp.core.domain.money import Currency, Money
-
 
 # ---------------------------------------------------------------------------
 # Order base

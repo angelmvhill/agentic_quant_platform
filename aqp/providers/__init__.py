@@ -18,6 +18,7 @@ Why layer this on top of the existing :class:`aqp.data.sources.base.DataSourceAd
 Both flows share the ``data_sources`` registry — a ``Fetcher`` declares its
 ``vendor_key`` which maps 1:1 to a ``data_sources.name`` row.
 """
+from aqp.providers import alpha_vantage as alpha_vantage
 from aqp.providers.base import (
     AnnotatedResult,
     CostTier,
@@ -32,7 +33,6 @@ from aqp.providers.catalog import (
     pick_fetcher,
     register_fetcher,
 )
-from aqp.providers import alpha_vantage as alpha_vantage
 
 __all__ = [
     "AnnotatedResult",

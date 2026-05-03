@@ -284,10 +284,13 @@ class RedisVectorStore:
                 TextField,
                 VectorField,
             )
-            from redis.commands.search.indexDefinition import (  # type: ignore[import-not-found]
-                IndexDefinition,
-                IndexType,
-            )
+            try:
+                from redis.commands.search.index_definition import IndexDefinition, IndexType
+            except ImportError:
+                from redis.commands.search.indexDefinition import (  # type: ignore[import-not-found,no-redef]
+                    IndexDefinition,
+                    IndexType,
+                )
         except Exception:  # pragma: no cover
             logger.warning("RediSearch not available on this redis-py; using fallback.")
             self._client = None

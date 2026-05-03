@@ -132,9 +132,8 @@ def order_matches_rule(order: dict[str, Any], rule: dict[str, Any]) -> bool:
         if qty * price < min_notional:
             return False
     min_size = _coerce_number(rule.get("min_size_pct"))
-    if min_size is not None:
-        if (_coerce_number(order.get("size_pct")) or 0.0) < min_size:
-            return False
+    if min_size is not None and (_coerce_number(order.get("size_pct")) or 0.0) < min_size:
+        return False
     max_conf = _coerce_number(rule.get("max_confidence"))
     if max_conf is not None:
         conf = _coerce_number(order.get("confidence"))

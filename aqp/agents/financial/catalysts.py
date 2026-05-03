@@ -11,7 +11,6 @@ import re
 from datetime import datetime, timedelta
 from typing import Any
 
-
 _CATALYST_KEYWORDS: dict[str, list[str]] = {
     "earnings": ["earnings", "q1", "q2", "q3", "q4", "results", "guidance"],
     "product": ["launch", "release", "unveil", "ship", "rollout", "available"],
