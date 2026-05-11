@@ -18,6 +18,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 
+from aqp.persistence._tenancy_mixins import ProjectScopedMixin
 from aqp.persistence.models import Base
 
 
@@ -25,7 +26,7 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-class AirbyteConnectorRow(Base):
+class AirbyteConnectorRow(Base, ProjectScopedMixin):
     """AQP-curated or discovered Airbyte connector definition."""
 
     __tablename__ = "airbyte_connectors"
@@ -45,11 +46,21 @@ class AirbyteConnectorRow(Base):
     streams = Column(JSON, default=list)
     tags = Column(JSON, default=list)
     capabilities = Column(JSON, default=list)
+    # Self-service Airbyte builder (data fabric phase 2 — Alembic 0033).
+    # ``manifest_yaml`` is the round-tripped low-code CDK YAML emitted
+    # from the visual builder. ``aqp_fetcher_path`` is the dotted
+    # module path of an AQP-native :class:`Fetcher` stub generated
+    # under ``aqp/data/fetchers/userland/<slug>.py`` when the user
+    # toggles "Custom Python". ``builder_state_json`` carries the raw
+    # form state so re-opening the builder shows the same values.
+    manifest_yaml = Column(Text, nullable=True)
+    aqp_fetcher_path = Column(String(240), nullable=True)
+    builder_state_json = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
-class AirbyteConnectionRow(Base):
+class AirbyteConnectionRow(Base, ProjectScopedMixin):
     """Configured source -> destination connection managed by AQP."""
 
     __tablename__ = "airbyte_connections"
@@ -81,7 +92,7 @@ class AirbyteConnectionRow(Base):
     )
 
 
-class AirbyteSyncRunRow(Base):
+class AirbyteSyncRunRow(Base, ProjectScopedMixin):
     """One Airbyte job or embedded read invocation."""
 
     __tablename__ = "airbyte_sync_runs"

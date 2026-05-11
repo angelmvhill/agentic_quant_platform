@@ -1,6 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 
-export type FlowDomain = "agent" | "data" | "strategy";
+export type FlowDomain = "agent" | "data" | "strategy" | "bot" | "ml" | "rl";
 
 /**
  * Base shape for AQP flow nodes. Each node carries a `kind` discriminator
@@ -12,6 +12,7 @@ export interface AqpNodeData extends Record<string, unknown> {
   kind: string;
   label?: string;
   params?: Record<string, unknown>;
+  accent?: string;
   /** Set on the canvas to make duplicate / focus / delete easier. */
   notes?: string;
 }
@@ -48,6 +49,12 @@ export interface PaletteItem {
   defaultParams?: Record<string, unknown>;
   /** Optional accent color for the node card border. */
   accent?: string;
+}
+
+export function isPaletteItem(value: unknown): value is PaletteItem {
+  if (!value || typeof value !== "object") return false;
+  const item = value as Partial<PaletteItem>;
+  return typeof item.kind === "string" && typeof item.label === "string";
 }
 
 export interface PaletteSection {

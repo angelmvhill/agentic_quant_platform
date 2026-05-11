@@ -7,44 +7,16 @@ from __future__ import annotations
 
 from dagster import Definitions
 
-from aqp.dagster.assets import (
-    airbyte as airbyte_assets,
-)
-from aqp.dagster.assets import (
-    catalog as catalog_assets,
-)
-from aqp.dagster.assets import (
-    compaction as compaction_assets,
-)
-from aqp.dagster.assets import (
-    entities as entity_assets,
-)
-from aqp.dagster.assets import (
-    profiling as profiling_assets,
-)
-from aqp.dagster.assets import (
-    sources as source_assets,
-)
+from aqp.dagster.assets import all_assets
+from aqp.dagster.checks import ALL_ASSET_CHECKS
 from aqp.dagster.jobs import ALL_JOBS
 from aqp.dagster.resources import build_resources
 from aqp.dagster.schedules import ALL_SCHEDULES
 from aqp.dagster.sensors import ALL_SENSORS
 
-_ASSETS = []
-for module in (
-    source_assets,
-    entity_assets,
-    catalog_assets,
-    profiling_assets,
-    compaction_assets,
-    airbyte_assets,
-):
-    for value in vars(module).values():
-        if hasattr(value, "op") and hasattr(value, "key"):
-            _ASSETS.append(value)
-
 defs = Definitions(
-    assets=_ASSETS,
+    assets=all_assets(),
+    asset_checks=ALL_ASSET_CHECKS,
     jobs=ALL_JOBS,
     schedules=ALL_SCHEDULES,
     sensors=ALL_SENSORS,

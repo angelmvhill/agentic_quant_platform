@@ -13,6 +13,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
+    docker.io \
+    docker-compose \
     git \
     libpq-dev \
     postgresql-client \
@@ -70,10 +72,13 @@ CMD ["aqp-stream-ingest", "--venue", "all"]
 ###############################################################################
 FROM base AS api
 
+# Phase 0 — adds the [auth] extra so python-jose ships in the API image
+# and OIDC validate_jwt() works when AQP_AUTH_PROVIDER=oidc. boto3
+# (for MinIO uploads) comes in transitively via [iceberg] -> s3fs ->
+# botocore; the DatasetManager has a local-fs fallback when neither
+# boto3 nor MinIO endpoints are configured.
 RUN pip install --upgrade pip && pip install --retries 10 --timeout 60 --resume-retries 20 \
-    -e ".[iceberg,regulatory,agents-rag,llm-finance,otel,cli]" \
-    "pytest>=7.4" \
-    "ruff>=0.3"
+    -e ".[auth,dev,otel,cli,iceberg,visualization,entity-graph,dagster-aqp,compute-dask,compute-ray]"
 
 EXPOSE 8000 8765
 
@@ -108,7 +113,7 @@ CMD ["aqp", "serve", "mlflow", "--help"]
 ###############################################################################
 FROM base AS ml-train
 
-RUN pip install --upgrade pip && pip install -e ".[ml,ml-torch,ml-forecast,ml-anomaly,portfolio,otel,cli,iceberg]"
+RUN pip install --upgrade pip && pip install -e ".[ml,ml-torch,ml-forecast,ml-anomaly,portfolio,otel,cli,iceberg,entity-graph,dagster-aqp]"
 
 RUN useradd --system --uid 1001 aqp \
     && mkdir -p /app/data \

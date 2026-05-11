@@ -52,6 +52,11 @@ from aqp.persistence.models_agents import (
     AgentSpecRow,
     AgentSpecVersion,
 )
+from aqp.persistence.models_bots import (
+    Bot,
+    BotDeployment,
+    BotVersion,
+)
 from aqp.persistence.models_airbyte import (
     AirbyteConnectionRow,
     AirbyteConnectorRow,
@@ -173,12 +178,51 @@ from aqp.persistence.models_regulatory import (
     UsptoPatent,
     UsptoTrademark,
 )
+from aqp.persistence.models_rl import (
+    RLComponentRegistration,
+    RLEquityCurveRef,
+    RLEvaluation,
+    RLExperimentSpec as RLExperimentSpecRow,
+    RLExperimentVersion,
+    RLRun,
+    RLTrajectoryRef,
+)
+from aqp.persistence.models_analysis import (
+    AnalysisRun,
+    AnalysisSpec as AnalysisSpecRow,
+    AnalysisSpecVersion,
+    AnalysisStepResult,
+)
 from aqp.persistence.models_taxonomy import (
     EntityCrosswalk,
     EntityTag,
     TaxonomyNode,
     TaxonomyScheme,
 )
+from aqp.persistence.models_tenancy import (
+    ConfigOverlayRow,
+    Lab,
+    Membership,
+    Organization,
+    Project,
+    Team,
+    User,
+    Workspace,
+)
+from aqp.persistence.models_data_control import (
+    DatasetPipelineConfigRow,
+    SourceLibraryEntry,
+    SourceMetadataVersion,
+)
+from aqp.persistence.models_extraction import (
+    DatasetPresetRow,
+    ExtractionAuditRow,
+)
+from aqp.persistence.models_sinks import SinkRow, SinkVersionRow
+from aqp.persistence.models_dagster_sandbox import DagsterSandboxSessionRow
+from aqp.persistence.models_producers import MarketDataProducerRow
+from aqp.persistence.models_streaming_links import StreamingDatasetLink
+from aqp.persistence.models_lineage import DataLineageEvent
 
 __all__ = [
     # Original core
@@ -287,6 +331,15 @@ __all__ = [
     "EntityTag",
     "TaxonomyNode",
     "TaxonomyScheme",
+    # Tenancy (multi-tenant resource ownership)
+    "ConfigOverlayRow",
+    "Lab",
+    "Membership",
+    "Organization",
+    "Project",
+    "Team",
+    "User",
+    "Workspace",
     # Agents (Phase 3)
     "AgentAnnotation",
     "AgentEvalMetric",
@@ -296,6 +349,10 @@ __all__ = [
     "AgentRunV2",
     "AgentSpecRow",
     "AgentSpecVersion",
+    # Bots (Bot Entity Refactor)
+    "Bot",
+    "BotDeployment",
+    "BotVersion",
     # Airbyte data fabric
     "AirbyteConnectionRow",
     "AirbyteConnectorRow",
@@ -324,6 +381,19 @@ __all__ = [
     "UsptoAssignment",
     "UsptoPatent",
     "UsptoTrademark",
+    # RL layer (FinRL + FinRobot inspired refactor)
+    "RLComponentRegistration",
+    "RLEquityCurveRef",
+    "RLEvaluation",
+    "RLExperimentSpecRow",
+    "RLExperimentVersion",
+    "RLRun",
+    "RLTrajectoryRef",
+    # Analysis layer (research / diagnostic / production analyses)
+    "AnalysisRun",
+    "AnalysisSpecRow",
+    "AnalysisSpecVersion",
+    "AnalysisStepResult",
     # Data engine pipelines (Phase 3 — data-fabric expansion)
     "DatahubSyncLog",
     "DatasetProfile",
@@ -336,6 +406,22 @@ __all__ = [
     "EntityIdentifier",
     "EntityRelation",
     "EntityRow",
+    # Data control plane (source library + project pipeline configs)
+    "DatasetPipelineConfigRow",
+    "SourceLibraryEntry",
+    "SourceMetadataVersion",
+    # Inspiration rehydration / dataset preset library
+    "DatasetPresetRow",
+    "ExtractionAuditRow",
+    # Sinks / producers / streaming linkage (data layer expansion)
+    "MarketDataProducerRow",
+    "SinkRow",
+    "SinkVersionRow",
+    "StreamingDatasetLink",
+    # Dagster sandbox (data fabric phase 3)
+    "DagsterSandboxSessionRow",
+    # Data lineage (Phase 2 - data layer unification)
+    "DataLineageEvent",
     # DB utilities
     "async_engine",
     "async_session_dep",

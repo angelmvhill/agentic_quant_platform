@@ -1,19 +1,4 @@
-"""Root ``aqp`` Typer CLI.
-
-Consolidates what used to be five separate console-scripts plus bespoke
-``make`` targets into a single discoverable surface::
-
-    aqp api
-    aqp ui
-    aqp worker
-    aqp beat
-    aqp dash
-    aqp paper run --config configs/paper/alpaca_mean_rev.yaml
-    aqp backtest run --config configs/strategies/mean_reversion.yaml
-    aqp data load --path /mnt/vendor/bars --format csv
-    aqp bootstrap
-    aqp health
-"""
+"""Top-level Typer app for the ``aqp`` CLI."""
 from __future__ import annotations
 
 import json
@@ -26,15 +11,19 @@ from typing import Any
 import typer
 import yaml
 
+from aqp.cli.config_cmd import app as config_app
+from aqp.cli.viz_cmd import app as viz_app
 from aqp.config import settings
 
 logger = logging.getLogger(__name__)
 
 app = typer.Typer(
-    add_completion=False,
-    help="Agentic Quant Platform — unified command-line interface.",
+    name="aqp",
+    help="Agentic Quant Platform CLI",
     no_args_is_help=True,
 )
+app.add_typer(config_app, name="config", help="Layered config inspection / mutation")
+app.add_typer(viz_app, name="viz", help="Visualization layer (Superset + Bokeh) operations")
 
 
 # ---------------------------------------------------------------------------
@@ -612,5 +601,5 @@ def _main() -> Any:
     return app()
 
 
-if __name__ == "__main__":  # pragma: no cover
-    sys.exit(_main())
+if __name__ == "__main__":
+    app()

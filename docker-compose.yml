@@ -36,6 +36,29 @@ services:
       timeout: 3s
       retries: 5
 
+  neo4j:
+    image: neo4j:5-community
+    container_name: aqp-neo4j
+    environment:
+      NEO4J_AUTH: "${AQP_NEO4J_USER:-neo4j}/${AQP_NEO4J_PASSWORD:-aqpneo4j}"
+      AQP_NEO4J_USER: "${AQP_NEO4J_USER:-neo4j}"
+      AQP_NEO4J_PASSWORD: "${AQP_NEO4J_PASSWORD:-aqpneo4j}"
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 512m
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u \"$${AQP_NEO4J_USER}\" -p \"$${AQP_NEO4J_PASSWORD}\" 'RETURN 1;' >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.11.1
     container_name: aqp-mlflow
@@ -159,6 +182,11 @@ services:
       AQP_REDIS_PUBSUB_URL: redis://redis:6379/1
       AQP_POSTGRES_DSN: postgresql+psycopg2://aqp:aqp@postgres:5432/aqp
       AQP_POSTGRES_ASYNC_DSN: postgresql+asyncpg://aqp:aqp@postgres:5432/aqp
+      AQP_GRAPH_STORE: "${AQP_GRAPH_STORE:-neo4j}"
+      AQP_NEO4J_URI: bolt://neo4j:7687
+      AQP_NEO4J_USER: "${AQP_NEO4J_USER:-neo4j}"
+      AQP_NEO4J_PASSWORD: "${AQP_NEO4J_PASSWORD:-aqpneo4j}"
+      AQP_NEO4J_DATABASE: "${AQP_NEO4J_DATABASE:-neo4j}"
       AQP_CHROMA_HOST: chromadb
       AQP_CHROMA_PORT: "8000"
       AQP_MLFLOW_TRACKING_URI: http://mlflow:5000
@@ -178,8 +206,9 @@ services:
       AQP_S3_ACCESS_KEY: ""
       AQP_S3_SECRET_KEY: ""
       AQP_S3_REGION: "${AQP_S3_REGION:-us-east-1}"
-      # Next.js webui (:3000) calls the API from the browser; whitelist enables credentialed CORS if needed.
-      AQP_WEBUI_CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      # Browser frontends call the API directly from these dev/preview ports.
+      # :3000 = legacy Next.js webui, :3001 = Vite dev, :3002 = compose preview.
+      AQP_WEBUI_CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002
       # Writable HOME / data dirs — CrewAI's RAG module eagerly wants a
       # writable ``platformdirs.user_data_dir`` on first class import.
       HOME: /app
@@ -189,6 +218,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
       - "C:/Users/angel/Downloads:/host-downloads:ro"
       # Persistent Iceberg warehouse + staging on the host drive. Tear
       # down the entire stack and the catalog still survives here.
@@ -199,6 +229,8 @@ services:
       redis:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+      neo4j:
         condition: service_healthy
       chromadb:
         condition: service_started
@@ -218,6 +250,11 @@ services:
       AQP_REDIS_PUBSUB_URL: redis://redis:6379/1
       AQP_POSTGRES_DSN: postgresql+psycopg2://aqp:aqp@postgres:5432/aqp
       AQP_POSTGRES_ASYNC_DSN: postgresql+asyncpg://aqp:aqp@postgres:5432/aqp
+      AQP_GRAPH_STORE: "${AQP_GRAPH_STORE:-neo4j}"
+      AQP_NEO4J_URI: bolt://neo4j:7687
+      AQP_NEO4J_USER: "${AQP_NEO4J_USER:-neo4j}"
+      AQP_NEO4J_PASSWORD: "${AQP_NEO4J_PASSWORD:-aqpneo4j}"
+      AQP_NEO4J_DATABASE: "${AQP_NEO4J_DATABASE:-neo4j}"
       AQP_CHROMA_HOST: chromadb
       AQP_CHROMA_PORT: "8000"
       AQP_MLFLOW_TRACKING_URI: http://mlflow:5000
@@ -245,6 +282,8 @@ services:
       redis:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+      neo4j:
         condition: service_healthy
       chromadb:
         condition: service_started
@@ -327,9 +366,9 @@ services:
       - api
 
   # -----------------------------------------------------------------------
-  # Next.js 15 webui (Phase 0 of the Solara → React migration). Runs on
-  # :3000 alongside the legacy Solara UI on :8765 until feature parity is
-  # reached. Drop this section's dependency on `ui` to deprecate Solara.
+  # Legacy Next.js 15 webui. Stays on :3000 during the Vite + Tailwind
+  # rewrite (see service ``frontend`` below). Will be retired once the new
+  # frontend reaches parity (tracked in the rewrite plan, Phases 2-6).
   # -----------------------------------------------------------------------
   webui:
     build:
@@ -341,6 +380,7 @@ services:
         NEXT_PUBLIC_DASH_URL: http://localhost:8000/dash/
         NEXT_PUBLIC_MLFLOW_URL: http://localhost:5000
         NEXT_PUBLIC_JAEGER_URL: http://localhost:16686
+        NEXT_PUBLIC_SUPERSET_URL: http://localhost:8088
     container_name: aqp-webui
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
@@ -348,10 +388,36 @@ services:
       NEXT_PUBLIC_DASH_URL: http://localhost:8000/dash/
       NEXT_PUBLIC_MLFLOW_URL: http://localhost:5000
       NEXT_PUBLIC_JAEGER_URL: http://localhost:16686
+      NEXT_PUBLIC_SUPERSET_URL: http://localhost:8088
       AQP_API_URL: http://api:8000
       AQP_WS_URL: ws://api:8000
     ports:
       - "3000:3000"
+    depends_on:
+      - api
+
+  # -----------------------------------------------------------------------
+  # Vite 7 + Tailwind 4 + shadcn/ui frontend (rewrite target). Phases 0-6
+  # ship today (full route parity except a small long-tail). Local dev
+  # runs on :3001 (`pnpm dev`); the docker-compose-managed container is
+  # published on host :3002 to coexist with the dagster-webserver that
+  # already binds host :3001 in the visualization profile.
+  # -----------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+        VITE_WS_URL: ws://localhost:8000
+        VITE_DEFAULT_MODE: live
+    container_name: aqp-frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_WS_URL: ws://localhost:8000
+      VITE_DEFAULT_MODE: live
+    ports:
+      - "3002:3001"
     depends_on:
       - api
 
@@ -361,6 +427,7 @@ services:
   # Override ``command`` to switch to a real config.
   # -----------------------------------------------------------------------
   paper-trader:
+    profiles: ["paper"]
     build:
       context: .
       dockerfile: Dockerfile
@@ -610,6 +677,8 @@ services:
 volumes:
   redis-data:
   postgres-data:
+  neo4j-data:
+  neo4j-logs:
   mlflow-artifacts:
   chroma-data:
   kafka-data:

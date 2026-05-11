@@ -29,6 +29,7 @@ back to the legacy parquet path.
 """
 from __future__ import annotations
 
+import json
 import logging
 import threading
 import time
@@ -63,11 +64,50 @@ class IcebergTableNotFoundError(IcebergUnavailableError):
 _LOCK = threading.Lock()
 
 
+def _stamp_tenancy_columns(table: pa.Table, context: Any) -> pa.Table:
+    """Inject ``_workspace_id`` and ``_project_id`` columns into ``table``.
+
+    Skips columns that already exist so callers can pre-populate them when
+    needed. Borrowed from Lean's ObjectStore key-prefix idea
+    (``Common/Interfaces/IObjectStore.cs::Initialize(userId, projectId, ...)``)
+    — except we materialise the prefix as Iceberg columns rather than
+    folder paths so analytical queries can predicate on tenancy directly.
+    """
+    try:
+        import pyarrow as pa  # noqa: F401 - only needed for the ``Table`` type
+    except ImportError:
+        return table
+    row_count = int(table.num_rows)
+    if row_count == 0:
+        return table
+    import pyarrow as pa
+
+    workspace_id = str(getattr(context, "workspace_id", "") or "")
+    project_id = str(getattr(context, "project_id", "") or "")
+    if "_workspace_id" not in table.column_names:
+        table = table.append_column(
+            "_workspace_id",
+            pa.array([workspace_id] * row_count, type=pa.string()),
+        )
+    if "_project_id" not in table.column_names:
+        table = table.append_column(
+            "_project_id",
+            pa.array([project_id] * row_count, type=pa.string()),
+        )
+    return table
+
+
 _TABLE_NOT_FOUND_MARKERS = (
     "no such table",
     "nosuchtable",
     "tablenotfound",
     "table_not_found",
+)
+
+_WAREHOUSE_NOT_FOUND_MARKERS = (
+    "unable to find warehouse",
+    "warehouse not found",
+    "nosuchwarehouse",
 )
 
 _SQLITE_LOCK_MARKERS = (
@@ -82,6 +122,16 @@ def _is_table_not_found(exc: BaseException) -> bool:
     if any(marker in msg for marker in _TABLE_NOT_FOUND_MARKERS):
         return True
     return type(exc).__name__ in {"NoSuchTableError", "TableNotFoundError"}
+
+
+def _is_warehouse_not_found(exc: BaseException) -> bool:
+    """Return true when a REST catalog exists but the configured warehouse/catalog doesn't."""
+    msg = str(exc).lower()
+    if any(marker in msg for marker in _WAREHOUSE_NOT_FOUND_MARKERS):
+        return True
+    return type(exc).__name__ in {"NoSuchWarehouseError", "WarehouseNotFoundError", "NotFoundException"} and (
+        "warehouse" in msg
+    )
 
 
 def _is_sqlite_locked(exc: BaseException) -> bool:
@@ -128,7 +178,16 @@ def _require_pyiceberg() -> None:
 
 
 def _build_properties() -> dict[str, str]:
-    """Translate AQP settings into a PyIceberg ``Catalog`` properties dict."""
+    """Translate AQP settings into a PyIceberg ``Catalog`` properties dict.
+
+    The REST ``credential`` (and OAuth fields) resolve through
+    :class:`aqp.credentials.CredentialResolver`, so bootstrap-minted
+    runtime credentials supersede the static
+    ``settings.iceberg_rest_credential`` seed. SQL-mode (laptop dev)
+    bypasses the resolver entirely — there is no remote auth to make.
+    """
+    from aqp.credentials import CredentialKey, get_resolver
+
     rest_uri = (settings.iceberg_rest_uri or "").strip()
     warehouse_path = Path(settings.iceberg_warehouse).expanduser().resolve()
     warehouse_path.mkdir(parents=True, exist_ok=True)
@@ -140,6 +199,42 @@ def _build_properties() -> dict[str, str]:
             "uri": rest_uri,
             "warehouse": warehouse,
         }
+        rest_creds = get_resolver().resolve(
+            CredentialKey("iceberg", "rest"),
+            default={
+                "credential": settings.iceberg_rest_credential or "",
+                "token": settings.iceberg_rest_token or "",
+                "oauth2_server_uri": settings.iceberg_rest_oauth2_server_uri or "",
+                "scope": settings.iceberg_rest_scope or "",
+            },
+        )
+        # The Polaris bootstrap file lives under the ``polaris`` service
+        # key; consult it as the authoritative override when iceberg
+        # itself has no entry but Polaris does.
+        if not rest_creds.get("credential"):
+            polaris_rest = get_resolver().resolve(CredentialKey("polaris", "rest"))
+            if polaris_rest.get("credential"):
+                rest_creds = polaris_rest
+        if rest_creds.get("credential"):
+            props["credential"] = rest_creds.require("credential")
+        if rest_creds.get("token"):
+            props["token"] = rest_creds.require("token")
+        if rest_creds.get("oauth2_server_uri"):
+            props["oauth2-server-uri"] = rest_creds.require("oauth2_server_uri")
+        if rest_creds.get("scope"):
+            props["scope"] = rest_creds.require("scope")
+        if settings.iceberg_rest_extra_properties_json:
+            try:
+                extra = json.loads(settings.iceberg_rest_extra_properties_json)
+                if isinstance(extra, dict):
+                    props.update({str(k): str(v) for k, v in extra.items() if v is not None})
+            except Exception:
+                logger.warning("Invalid AQP_ICEBERG_REST_EXTRA_PROPERTIES_JSON ignored", exc_info=True)
+        if rest_creds.source != "default":
+            logger.debug(
+                "Iceberg REST credential resolved from %s",
+                rest_creds.source,
+            )
     else:
         sqlite_path = warehouse_path / "catalog.db"
         props = {
@@ -163,7 +258,7 @@ def _build_properties() -> dict[str, str]:
 
 
 @lru_cache(maxsize=1)
-def get_catalog() -> "Catalog":
+def get_catalog() -> Catalog:
     """Return a cached :class:`pyiceberg.catalog.Catalog` handle."""
     _require_pyiceberg()
     from pyiceberg.catalog import load_catalog
@@ -225,7 +320,14 @@ def ensure_namespace(namespace: str) -> None:
 def list_namespaces() -> list[str]:
     catalog = get_catalog()
     out: list[str] = []
-    for ns in catalog.list_namespaces():
+    try:
+        namespaces = catalog.list_namespaces()
+    except Exception as exc:  # noqa: BLE001
+        if _is_warehouse_not_found(exc):
+            logger.info("Iceberg warehouse is not bootstrapped yet: %s", exc)
+            return []
+        raise
+    for ns in namespaces:
         out.append(".".join(ns) if isinstance(ns, (tuple, list)) else str(ns))
     return sorted(out)
 
@@ -233,11 +335,13 @@ def list_namespaces() -> list[str]:
 def list_tables(namespace: str | None = None) -> list[str]:
     catalog = get_catalog()
     items: list[str] = []
-    namespaces: list[str]
-    if namespace:
-        namespaces = [namespace]
-    else:
-        namespaces = list_namespaces()
+    try:
+        namespaces = [namespace] if namespace else list_namespaces()
+    except Exception as exc:  # noqa: BLE001
+        if _is_warehouse_not_found(exc):
+            logger.info("Iceberg warehouse is not bootstrapped yet: %s", exc)
+            return []
+        raise
     for ns in namespaces:
         ns_tuple = tuple(ns.split("."))
         try:
@@ -249,11 +353,14 @@ def list_tables(namespace: str | None = None) -> list[str]:
         except Exception as exc:  # noqa: BLE001
             if _is_table_not_found(exc):
                 continue
+            if _is_warehouse_not_found(exc):
+                logger.info("Iceberg warehouse is not bootstrapped yet: %s", exc)
+                return []
             logger.warning("list_tables(%s) failed: %s", ns, exc)
     return sorted(items)
 
 
-def load_table(identifier: str | tuple[str, ...]) -> "Table | None":
+def load_table(identifier: str | tuple[str, ...]) -> Table | None:
     """Return the loaded Iceberg table or ``None`` if the table does not exist.
 
     Real catalog failures (sqlite locked, REST timeouts, missing
@@ -268,6 +375,9 @@ def load_table(identifier: str | tuple[str, ...]) -> "Table | None":
     except Exception as exc:
         if _is_table_not_found(exc):
             logger.debug("load_table(%s.%s) miss", ns, name)
+            return None
+        if _is_warehouse_not_found(exc):
+            logger.info("load_table(%s.%s) skipped; Iceberg warehouse is not bootstrapped yet", ns, name)
             return None
         raise
 
@@ -288,7 +398,7 @@ def drop_table(identifier: str | tuple[str, ...]) -> bool:
         return False
 
 
-def _iceberg_schema_from_arrow(arrow_schema: "pa.Schema") -> "Any":
+def _iceberg_schema_from_arrow(arrow_schema: pa.Schema) -> Any:
     """Convert a PyArrow schema to an Iceberg :class:`Schema` with stable field ids.
 
     PyIceberg 0.11+ rejects ``pyarrow_to_schema(..., name_mapping=None)`` for
@@ -306,11 +416,11 @@ def _iceberg_schema_from_arrow(arrow_schema: "pa.Schema") -> "Any":
 
 def create_or_replace_table(
     identifier: str | tuple[str, ...],
-    arrow_schema: "pa.Schema",
+    arrow_schema: pa.Schema,
     *,
     properties: dict[str, str] | None = None,
-    partition_spec: "Any" = None,
-) -> "Table":
+    partition_spec: Any = None,
+) -> Table:
     """Drop ``identifier`` if present, then create a fresh table from ``arrow_schema``.
 
     PyIceberg's ``Catalog.create_table`` accepts either a :class:`pyarrow.Schema`
@@ -353,7 +463,7 @@ def create_or_replace_table(
     )
 
 
-def _resolve_partition_spec(spec: "Any", arrow_schema: "pa.Schema") -> "Any":
+def _resolve_partition_spec(spec: Any, arrow_schema: pa.Schema) -> Any:
     """Coerce a list-of-dicts partition descriptor into a PyIceberg PartitionSpec.
 
     Returns ``None`` for ``spec is None`` or the unchanged spec when it
@@ -457,12 +567,24 @@ def _table_exists(identifier: str | tuple[str, ...]) -> bool:
 
 def append_arrow(
     identifier: str | tuple[str, ...],
-    table: "pa.Table",
+    table: pa.Table,
     *,
     create_if_missing: bool = True,
     properties: dict[str, str] | None = None,
-    partition_spec: "Any" = None,
-) -> "Table":
+    partition_spec: Any = None,
+    context: Any | None = None,
+    shared: bool = False,
+    medallion_layer: str | None = None,
+    business_metadata: Any = None,
+    data_contract: Any = None,
+    actor: str | None = None,
+    actor_kind: str | None = None,
+    run_id: str | None = None,
+    manifest_id: str | None = None,
+    mcp_tool_name: str | None = None,
+    service_name: str | None = None,
+    register_metadata: bool | None = None,
+) -> Table:
     """Append ``table`` (pyarrow) to an Iceberg table, creating it on first call.
 
     ``partition_spec`` is forwarded to :func:`create_or_replace_table` when
@@ -471,33 +593,114 @@ def append_arrow(
 
     The whole operation is wrapped in an OpenTelemetry span so Jaeger shows
     every Iceberg write attached to the calling pipeline.
+
+    Tenancy: when ``context`` is supplied and ``shared=False``, the helper
+    injects a ``_workspace_id`` and ``_project_id`` column (or NULL when
+    the context lacks one) so downstream queries can partition by
+    workspace. Reference-data tables (instruments, regulatory corpora,
+    macro series) opt out of this by passing ``shared=True``.
+
+    Medallion / active-metadata: when ``medallion_layer`` is provided the
+    namespace prefix is validated against
+    :data:`aqp.data.catalog.active_metadata.LAYER_PREFIXES`. When
+    ``business_metadata`` is also provided, the
+    :class:`DatasetCatalog` row for this Iceberg identifier is upserted
+    via :func:`aqp.data.catalog.register_dataset` and a corresponding
+    ``data_lineage_events`` row is written through the
+    :class:`LineageWriter`. Set ``register_metadata=False`` to skip the
+    upsert (eg. when the catalog row is managed elsewhere).
     """
     table_id = identifier if isinstance(identifier, str) else ".".join(identifier)
+    namespace, _ = split_identifier(identifier)
+    layer_value: str | None = None
+    if medallion_layer is not None:
+        # Lazy import to avoid a circular import path on cold start.
+        from aqp.data.catalog.active_metadata import (
+            register_dataset as _register_dataset,
+            validate_layer_for_namespace as _validate_layer,
+        )
+
+        layer_value = str(medallion_layer).strip().lower()
+        _validate_layer(layer_value, namespace)
     with _tracer.start_as_current_span("iceberg.append_arrow") as span:
         try:
             span.set_attribute("iceberg.table", table_id)
             span.set_attribute("iceberg.row_count", int(table.num_rows))
             span.set_attribute("iceberg.create_if_missing", create_if_missing)
+            if layer_value is not None:
+                span.set_attribute("aqp.medallion_layer", layer_value)
+            if context is not None:
+                span.set_attribute("aqp.workspace_id", str(getattr(context, "workspace_id", "") or ""))
+                span.set_attribute("aqp.project_id", str(getattr(context, "project_id", "") or ""))
         except Exception:  # noqa: BLE001
             pass
+
+        if context is not None and not shared:
+            table = _stamp_tenancy_columns(table, context)
 
         _require_pyiceberg()
         if table.num_rows == 0:
             existing = load_table(identifier)
             if existing is not None:
+                _maybe_register_metadata(
+                    table_id=table_id,
+                    layer=layer_value,
+                    business_metadata=business_metadata,
+                    data_contract=data_contract,
+                    arrow_schema=table.schema,
+                    register_metadata=register_metadata,
+                    context=context,
+                )
+                _emit_iceberg_lineage(
+                    transform_kind="iceberg_append",
+                    target=table_id,
+                    rows_written=0,
+                    layer=layer_value,
+                    actor=actor,
+                    actor_kind=actor_kind,
+                    run_id=run_id,
+                    manifest_id=manifest_id,
+                    mcp_tool_name=mcp_tool_name,
+                    service_name=service_name,
+                    summary=f"no-op append on existing table (0 rows)",
+                )
                 return existing
             if create_if_missing:
-                return create_or_replace_table(
+                created_table = create_or_replace_table(
                     identifier,
                     table.schema,
                     properties=properties,
                     partition_spec=partition_spec,
                 )
+                _maybe_register_metadata(
+                    table_id=table_id,
+                    layer=layer_value,
+                    business_metadata=business_metadata,
+                    data_contract=data_contract,
+                    arrow_schema=table.schema,
+                    register_metadata=register_metadata,
+                    context=context,
+                )
+                _emit_iceberg_lineage(
+                    transform_kind="iceberg_create_or_replace",
+                    target=table_id,
+                    rows_written=0,
+                    layer=layer_value,
+                    actor=actor,
+                    actor_kind=actor_kind,
+                    run_id=run_id,
+                    manifest_id=manifest_id,
+                    mcp_tool_name=mcp_tool_name,
+                    service_name=service_name,
+                    summary="created empty table",
+                )
+                return created_table
             raise ValueError(
                 f"refused to create empty table {identifier!r} with create_if_missing=False"
             )
 
         existing = load_table(identifier)
+        was_created = False
         if existing is None:
             if not create_if_missing:
                 raise ValueError(
@@ -509,11 +712,124 @@ def append_arrow(
                 properties=properties,
                 partition_spec=partition_spec,
             )
+            was_created = True
         _retry_on_sqlite_lock(
             lambda: existing.append(table),
             label=f"append_arrow({table_id!r})",
         )
+        _maybe_register_metadata(
+            table_id=table_id,
+            layer=layer_value,
+            business_metadata=business_metadata,
+            data_contract=data_contract,
+            arrow_schema=table.schema,
+            register_metadata=register_metadata,
+            context=context,
+        )
+        _emit_iceberg_lineage(
+            transform_kind=(
+                "iceberg_create_or_replace" if was_created else "iceberg_append"
+            ),
+            target=table_id,
+            rows_written=int(table.num_rows),
+            layer=layer_value,
+            actor=actor,
+            actor_kind=actor_kind,
+            run_id=run_id,
+            manifest_id=manifest_id,
+            mcp_tool_name=mcp_tool_name,
+            service_name=service_name,
+            summary=(
+                f"created and wrote {int(table.num_rows)} rows"
+                if was_created
+                else f"appended {int(table.num_rows)} rows"
+            ),
+        )
         return existing
+
+
+def _maybe_register_metadata(
+    *,
+    table_id: str,
+    layer: str | None,
+    business_metadata: Any,
+    data_contract: Any,
+    arrow_schema: Any,
+    register_metadata: bool | None,
+    context: Any | None = None,
+) -> None:
+    """Upsert :class:`DatasetCatalog` when the caller supplied medallion + business metadata.
+
+    Failures are logged and swallowed — a busted catalog upsert must
+    never block an Iceberg write. ``register_metadata=False`` short
+    circuits even when the inputs are present.
+
+    ``context`` is the active :class:`RequestContext`; the catalog
+    upsert reads it (or falls back to the request-scoped contextvar)
+    to stamp ``owner_user_id`` / ``workspace_id`` / ``project_id`` on
+    the ``DatasetCatalog`` row, mirroring the row-level tenancy
+    columns injected by :func:`_stamp_tenancy_columns`.
+    """
+    if register_metadata is False:
+        return
+    if layer is None or business_metadata is None:
+        return
+    try:
+        from aqp.data.catalog.active_metadata import register_dataset as _register_dataset
+
+        _register_dataset(
+            table_id,
+            medallion_layer=layer,  # type: ignore[arg-type]
+            business_metadata=business_metadata,
+            data_contract=data_contract,
+            arrow_schema=arrow_schema,
+            context=context,
+        )
+    except Exception:  # noqa: BLE001
+        logger.warning(
+            "register_dataset failed for %s; continuing append", table_id, exc_info=True
+        )
+
+
+def _emit_iceberg_lineage(
+    *,
+    transform_kind: str,
+    target: str,
+    rows_written: int,
+    layer: str | None,
+    actor: str | None,
+    actor_kind: str | None,
+    run_id: str | None,
+    manifest_id: str | None,
+    mcp_tool_name: str | None,
+    service_name: str | None,
+    summary: str | None,
+) -> None:
+    """Fire a lineage event for an Iceberg write.
+
+    Failures are swallowed because lineage is a side channel — never
+    block the data path.
+    """
+    try:
+        from aqp.data.catalog.lineage import LineageEvent, get_lineage_bus
+
+        get_lineage_bus().emit(
+            LineageEvent(
+                transform_kind=transform_kind,
+                target_table_id=target,
+                rows_written=rows_written,
+                medallion_layer=layer,
+                actor=actor or "iceberg_catalog",
+                actor_kind=actor_kind or "service",
+                run_id=run_id,
+                manifest_id=manifest_id,
+                mcp_tool_name=mcp_tool_name,
+                service_name=service_name or "iceberg",
+                summary=summary,
+            )
+        )
+    except Exception:  # noqa: BLE001
+        logger.debug("lineage emit failed for %s", target, exc_info=True)
 
 
 def read_arrow(
@@ -522,7 +838,7 @@ def read_arrow(
     columns: Iterable[str] | None = None,
     limit: int | None = None,
     row_filter: Any = None,
-) -> "pa.Table | None":
+) -> pa.Table | None:
     """Scan an Iceberg table and return a PyArrow table.
 
     Returns ``None`` only when the table does not exist. Other failures
@@ -541,6 +857,104 @@ def read_arrow(
     if row_filter is not None:
         scan_kwargs["row_filter"] = row_filter
     scan = table.scan(**scan_kwargs)
+    return scan.to_arrow()
+
+
+def read_arrow_at(
+    identifier: str | tuple[str, ...],
+    *,
+    snapshot_id: int | None = None,
+    as_of: datetime | None = None,
+    columns: Iterable[str] | None = None,
+    limit: int | None = None,
+    row_filter: Any = None,
+) -> pa.Table | None:
+    """Time-travel read against an Iceberg table.
+
+    Picks the snapshot to read from in this priority order:
+
+    1. ``snapshot_id`` if provided
+    2. The latest snapshot whose ``timestamp_ms <= as_of`` if ``as_of``
+       is provided
+    3. The current table snapshot otherwise (equivalent to
+       :func:`read_arrow`)
+
+    Raises :class:`ValueError` if neither ``snapshot_id`` nor ``as_of``
+    matches an existing snapshot. Returns ``None`` if the table does
+    not exist.
+
+    Critical for backtests: pin every historical read to a
+    deterministic snapshot to defeat lookahead bias when source data
+    is updated retroactively.
+    """
+    table = load_table(identifier)
+    if table is None:
+        return None
+
+    target_snapshot_id: int | None = snapshot_id
+    if target_snapshot_id is None and as_of is not None:
+        if hasattr(as_of, "timestamp"):
+            cutoff_ms = int(as_of.timestamp() * 1000)
+        else:
+            raise ValueError("as_of must be a datetime instance")
+        candidate: int | None = None
+        for snap in table.snapshots():
+            ts_ms = int(snap.timestamp_ms)
+            if ts_ms <= cutoff_ms:
+                if candidate is None:
+                    candidate = int(snap.snapshot_id)
+                else:
+                    # snapshots() returns oldest-first; we want the most
+                    # recent snapshot prior to ``as_of`` so we keep
+                    # overwriting until the loop terminates.
+                    candidate = int(snap.snapshot_id)
+            else:
+                break
+        if candidate is None:
+            raise ValueError(
+                f"no snapshot of {identifier!r} at or before {as_of.isoformat()}"
+            )
+        target_snapshot_id = candidate
+
+    scan_kwargs: dict[str, Any] = {
+        "selected_fields": tuple(columns) if columns else ("*",),
+    }
+    if limit is not None:
+        scan_kwargs["limit"] = int(limit)
+    if row_filter is not None:
+        scan_kwargs["row_filter"] = row_filter
+    if target_snapshot_id is not None:
+        scan_kwargs["snapshot_id"] = int(target_snapshot_id)
+    scan = table.scan(**scan_kwargs)
+
+    table_id = identifier if isinstance(identifier, str) else ".".join(identifier)
+    try:
+        from aqp.data.catalog.lineage import LineageEvent, get_lineage_bus
+
+        get_lineage_bus().emit(
+            LineageEvent(
+                transform_kind="iceberg_time_travel_read",
+                source_table_id=table_id,
+                target_table_id=None,
+                actor="iceberg_catalog",
+                actor_kind="service",
+                service_name="iceberg",
+                summary=(
+                    f"read at snapshot_id={target_snapshot_id}"
+                    if target_snapshot_id is not None
+                    else "read at current snapshot"
+                ),
+                details={
+                    "snapshot_id": target_snapshot_id,
+                    "as_of": as_of.isoformat() if as_of else None,
+                    "columns": list(columns) if columns else None,
+                    "limit": limit,
+                },
+            )
+        )
+    except Exception:  # noqa: BLE001
+        logger.debug("lineage emit failed for time-travel read of %s", table_id, exc_info=True)
+
     return scan.to_arrow()
 
 
@@ -620,7 +1034,14 @@ def health_check(*, timeout: float | None = None) -> dict[str, Any]:
             raise TimeoutError("list_namespaces exceeded health-check deadline")
         info["ok"] = True
     except Exception as exc:  # noqa: BLE001
-        info["error"] = f"{type(exc).__name__}: {exc}"
+        if _is_warehouse_not_found(exc):
+            info["ok"] = True
+            info["namespace_count"] = 0
+            info["table_count"] = 0
+            info["catalog_ready"] = False
+            info["error"] = f"{type(exc).__name__}: {exc}"
+        else:
+            info["error"] = f"{type(exc).__name__}: {exc}"
     info["elapsed_seconds"] = round(time.monotonic() - started, 4)
     return info
 
@@ -670,7 +1091,6 @@ def latest_timestamps_for_symbols(
     # Arrow-native group-by + max — keeps the data in columnar Arrow
     # buffers and avoids the round-trip through Pandas. Falls back to
     # Polars only if the time column carries an unusual dtype.
-    import pyarrow.compute as pc
 
     try:
         grouped = arrow.group_by(group_col).aggregate([(time_col, "max")])
@@ -768,7 +1188,7 @@ def existing_keys_for_window(
 
 
 def iceberg_to_duckdb_view(
-    conn: "duckdb.DuckDBPyConnection",
+    conn: duckdb.DuckDBPyConnection,
     identifier: str | tuple[str, ...],
     *,
     view_name: str | None = None,
@@ -807,7 +1227,7 @@ def _sql_string(value: str) -> str:
     return "'" + str(value).replace("'", "''") + "'"
 
 
-def _configure_duckdb_s3(conn: "duckdb.DuckDBPyConnection") -> None:
+def _configure_duckdb_s3(conn: duckdb.DuckDBPyConnection) -> None:
     """Teach DuckDB how to read Iceberg data files from MinIO/S3."""
     if not settings.s3_endpoint_url:
         return

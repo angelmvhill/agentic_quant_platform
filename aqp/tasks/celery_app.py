@@ -30,6 +30,7 @@ _TASK_MODULES = [
     "aqp.tasks.paper_tasks",
     "aqp.tasks.factor_tasks",
     "aqp.tasks.ml_tasks",
+    "aqp.tasks.ml_test_tasks",
     "aqp.tasks.optimize_tasks",
     "aqp.tasks.feature_set_tasks",
     "aqp.tasks.equity_report_tasks",
@@ -45,8 +46,26 @@ _TASK_MODULES = [
     # Data fabric expansion: entity registry + DataHub sync.
     "aqp.tasks.entity_tasks",
     "aqp.tasks.datahub_tasks",
+    "aqp.tasks.engine_tasks",
+    "aqp.tasks.data_metadata_tasks",
     # Phase 5 — FinOps governance audit task.
     "aqp.tasks.finops_tasks",
+    # Phase 2 (multi-tenant) — interactive user uploads + merge.
+    "aqp.tasks.dataset_upload_tasks",
+    # Phase 4 — iterative agent-driven optimisation loop.
+    "aqp.tasks.optimization_tasks",
+    # Bot Entity Refactor — bot lifecycle tasks (backtest / paper / chat / deploy).
+    "aqp.tasks.bot_tasks",
+    # Visualization layer — Superset/Trino provisioning.
+    "aqp.tasks.visualization_tasks",
+    # Data layer expansion: scheduling + streaming link refresh.
+    "aqp.tasks.streaming_link_tasks",
+    # RL layer (FinRL + FinRobot inspired refactor) — runtime-driven tasks.
+    "aqp.tasks.rl_tasks",
+    # Analysis umbrella (hash-locked AnalysisSpec + flow catalog).
+    "aqp.tasks.analysis_flow_tasks",
+    # Self-service data fabric — interactive Dagster sandbox (phase 3).
+    "aqp.tasks.dagster_sandbox_tasks",
 ]
 
 if find_spec("aqp.data.airbyte") is not None:
@@ -93,6 +112,7 @@ celery_app.conf.update(
         "aqp.tasks.paper_tasks.*": {"queue": "paper"},
         "aqp.tasks.factor_tasks.*": {"queue": "factors"},
         "aqp.tasks.ml_tasks.*": {"queue": "ml"},
+        "aqp.tasks.ml_test_tasks.*": {"queue": "ml"},
         "aqp.tasks.optimize_tasks.*": {"queue": "backtest"},
         "aqp.tasks.feature_set_tasks.*": {"queue": "ml"},
         "aqp.tasks.equity_report_tasks.*": {"queue": "agents"},
@@ -100,8 +120,32 @@ celery_app.conf.update(
         "aqp.tasks.entity_tasks.*": {"queue": "agents"},
         "aqp.tasks.datahub_tasks.*": {"queue": "ingestion"},
         "aqp.tasks.airbyte_tasks.*": {"queue": "ingestion"},
+        "aqp.tasks.engine_tasks.*": {"queue": "ingestion"},
+        "aqp.tasks.dataset_upload_tasks.*": {"queue": "ingestion"},
+        "aqp.tasks.optimization_tasks.*": {"queue": "backtest"},
+        "aqp.tasks.data_metadata_tasks.*": {"queue": "ingestion"},
         "aqp.tasks.finops_tasks.*": {"queue": "default"},
         "aqp.tasks.dataset_preset_tasks.*": {"queue": "ingestion"},
+        # Bot lifecycle: route to the matching execution queues so backtest /
+        # paper / chat workloads inherit the existing per-queue capacity caps.
+        "aqp.tasks.bot_tasks.run_bot_backtest": {"queue": "backtest"},
+        "aqp.tasks.bot_tasks.run_bot_paper": {"queue": "paper"},
+        "aqp.tasks.bot_tasks.chat_research_bot": {"queue": "agents"},
+        "aqp.tasks.bot_tasks.deploy_bot": {"queue": "default"},
+        "aqp.tasks.visualization_tasks.*": {"queue": "ingestion"},
+        "aqp.tasks.streaming_link_tasks.*": {"queue": "ingestion"},
+        # RL layer (FinRL + FinRobot inspired refactor): RLRuntime-driven tasks
+        # share the existing ``training`` queue with the legacy ``train_rl`` /
+        # ``evaluate_rl`` tasks; ``paper_trade_rl`` rides on the ``paper`` queue.
+        "aqp.tasks.rl_tasks.train_rl_experiment": {"queue": "training"},
+        "aqp.tasks.rl_tasks.evaluate_rl_experiment": {"queue": "training"},
+        "aqp.tasks.rl_tasks.replay_trajectories": {"queue": "training"},
+        "aqp.tasks.rl_tasks.walk_forward_ensemble": {"queue": "training"},
+        "aqp.tasks.rl_tasks.best_of_n_search": {"queue": "training"},
+        "aqp.tasks.rl_tasks.paper_trade_rl": {"queue": "paper"},
+        # Analysis flows: light compute fan-out via the existing agents queue
+        # (matches aqp.tasks.analysis_tasks routing for symmetry).
+        "aqp.tasks.analysis_flow_tasks.*": {"queue": "agents"},
     },
     beat_schedule={
         "drift-check": {

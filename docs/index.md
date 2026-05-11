@@ -22,10 +22,16 @@ Triple-axis table of contents for the AQP docs.
 ### I'm an AI agent
 
 1. [../AGENTS.md](../AGENTS.md) — terse rule-set + project map.
-2. [glossary.md](glossary.md) — definitions.
-3. [erd.md](erd.md) + [class-diagram.md](class-diagram.md) — structural maps.
-4. [flows.md](flows.md) — end-to-end sequences.
-5. The relevant subsystem doc (table below).
+2. [../WORKFLOW.md](../WORKFLOW.md) — Plan / Act / Reflect cadence,
+   FAST vs SLOW modes, intervention nodes.
+3. [agentic-development.md](agentic-development.md) — spec-pattern
+   as the AQP skill-artifact + ADLC security manifesto.
+4. [../.cursor/rules/](../.cursor/rules) — glob-scoped rule files.
+5. [glossary.md](glossary.md) — definitions.
+6. [erd.md](erd.md) + [class-diagram.md](class-diagram.md) — structural maps.
+7. [flows.md](flows.md) — end-to-end sequences.
+8. The relevant subsystem doc (table below).
+9. (Cross-session work) [../.agents/state-template.md](../.agents/state-template.md).
 
 ## By lifecycle stage
 
@@ -39,11 +45,12 @@ flowchart LR
 
 | Stage | Docs |
 | --- | --- |
-| **Research** | [factor-research.md](factor-research.md), [ml-framework.md](ml-framework.md), [strategy-browser.md](strategy-browser.md), [data-plane.md](data-plane.md), [data-catalog.md](data-catalog.md) |
+| **Research** | [analysis-framework.md](analysis-framework.md), [analysis-lab.md](analysis-lab.md), [analysis-flows.md](analysis-flows.md), [factor-research.md](factor-research.md), [ml-framework.md](ml-framework.md), [ml-libraries.md](ml-libraries.md), [ml-alpha-backtest.md](ml-alpha-backtest.md), [ml-flows.md](ml-flows.md), [ml-preprocessing-pipeline.md](ml-preprocessing-pipeline.md), [ml-builder.md](ml-builder.md), [ml-testing.md](ml-testing.md), [rl-framework.md](rl-framework.md), [rl-lab.md](rl-lab.md), [rl-components.md](rl-components.md), [rl-iceberg.md](rl-iceberg.md), [strategy-browser.md](strategy-browser.md), [data-plane.md](data-plane.md), [data-catalog.md](data-catalog.md), [data-pipelines-hub.md](data-pipelines-hub.md), [visualization-layer.md](visualization-layer.md) |
 | **Backtest** | [backtest-engines.md](backtest-engines.md), [strategy-lifecycle.md](strategy-lifecycle.md) |
 | **Agentic** | [agentic-pipeline.md](agentic-pipeline.md), [providers.md](providers.md) |
-| **Paper / Live** | [paper-trading.md](paper-trading.md), [live-market.md](live-market.md), [streaming.md](streaming.md) |
-| **Cross-cutting** | [observability.md](observability.md), [webui.md](webui.md), [core-types.md](core-types.md), [domain-model.md](domain-model.md), [alpha-vantage.md](alpha-vantage.md) |
+| **Bots** | [bots.md](bots.md) (smallest deployable unit; aggregates universe + strategy + engine + ML + agents + RAG + metrics) |
+| **Paper / Live** | [paper-trading.md](paper-trading.md), [live-market.md](live-market.md), [streaming.md](streaming.md), [streaming-admin.md](streaming-admin.md) |
+| **Cross-cutting** | [observability.md](observability.md), [webui.md](webui.md), [core-types.md](core-types.md), [domain-model.md](domain-model.md), [alpha-vantage.md](alpha-vantage.md), [credentials.md](credentials.md), [identity.md](identity.md), [kubernetes-adapter.md](kubernetes-adapter.md), [local-platform.md](local-platform.md) |
 
 ## By subsystem
 
@@ -66,6 +73,13 @@ flowchart LR
 | --- | --- |
 | [data-plane.md](data-plane.md) | Provider → cache → DuckDB view pipeline |
 | [data-catalog.md](data-catalog.md) | Iceberg catalog + ingest pipeline |
+| [data-self-service.md](data-self-service.md) | Master narrative for the four-phase self-service data fabric expansion |
+| [datasets-catalog.md](datasets-catalog.md) | Kedro-style `BaseDataset` abstraction (data fabric phase 0) |
+| [metadata-cache.md](metadata-cache.md) | Redis prefetch cache backing every entity dropdown (data fabric phase 0) |
+| [data-discovery.md](data-discovery.md) | Active discovery browser unifying ingested + uningested catalog entries (data fabric phase 1) |
+| [airbyte-builder.md](airbyte-builder.md) | Schema-driven Airbyte connector builder + AQP Fetcher codegen (data fabric phase 2) |
+| [dagster-sandbox.md](dagster-sandbox.md) | Ephemeral interactive Dagster + Airbyte sandbox console (data fabric phase 3) |
+| [visualization-layer.md](visualization-layer.md) | Trino-backed Superset and Bokeh exploration layer |
 | [alpha-vantage.md](alpha-vantage.md) | AV provider quota + cache |
 | [streaming.md](streaming.md) | Kafka topic taxonomy + ingester layout |
 | [live-market.md](live-market.md) | Live subscription + WebSocket relay |
@@ -74,9 +88,19 @@ flowchart LR
 
 | Doc | Purpose |
 | --- | --- |
+| [analysis-framework.md](analysis-framework.md) | Hash-locked AnalysisSpec + AnalysisRuntime umbrella |
+| [analysis-lab.md](analysis-lab.md) | Hybrid `/analysis/lab` UI (dataset-tabs + XYFlow Composer) |
+| [analysis-flows.md](analysis-flows.md) | Per-flow reference for the analysis catalog |
 | [factor-research.md](factor-research.md) | Building factor / alpha strategies |
 | [ml-framework.md](ml-framework.md) | Train → register → deploy → score |
-| [backtest-engines.md](backtest-engines.md) | Engine catalogue + invariants |
+| [ml-libraries.md](ml-libraries.md) | Per-library reference (TF/Keras/Prophet/sklearn/PyOD/sktime/HF) |
+| [ml-alpha-backtest.md](ml-alpha-backtest.md) | `AlphaBacktestExperiment` orchestrator + `MLAlphaBacktestRun` schema |
+| [ml-flows.md](ml-flows.md) | Lightweight workbench flows catalog |
+| [ml-preprocessing-pipeline.md](ml-preprocessing-pipeline.md) | ML preprocessors as data-engine pipeline nodes |
+| [ml-builder.md](ml-builder.md) | Graphical experiment builder UX |
+| [ml-testing.md](ml-testing.md) | Interactive ML testing workbench |
+| [backtest-engines.md](backtest-engines.md) | Engine catalogue + invariants (vbt-pro primary, event-driven, ZVT, AAT, fallback) |
+| [vbtpro-integration.md](vbtpro-integration.md) | Deep vectorbt-pro integration: modes, hooks, agent + ML components, walk-forward |
 | [strategy-lifecycle.md](strategy-lifecycle.md) | draft → backtested → paper → live |
 | [strategy-browser.md](strategy-browser.md) | Data-browser → strategy spec UX |
 
@@ -84,6 +108,8 @@ flowchart LR
 
 | Doc | Purpose |
 | --- | --- |
+| [agentic-development.md](agentic-development.md) | AQP's spec-pattern as the agentic-coder skill-artifact equivalent + consolidated ADLC security manifesto |
+| [multi-agent-patterns.md](multi-agent-patterns.md) | Sequential / Parallel / Debate / Coordinator / ReAct topologies mapped to [aqp/agents/graph/](../aqp/agents/graph/) |
 | [agentic-pipeline.md](agentic-pipeline.md) | Crew control plane |
 | [providers.md](providers.md) | LLM provider registry + tier routing |
 
@@ -92,6 +118,7 @@ flowchart LR
 | Doc | Purpose |
 | --- | --- |
 | [paper-trading.md](paper-trading.md) | Session loop + risk model |
+| [bots.md](bots.md) | Bot entity (TradingBot / ResearchBot), graphical builder, deployment |
 | [observability.md](observability.md) | OTEL → Jaeger + structured logs |
 | [webui.md](webui.md) | Next.js page tree |
 

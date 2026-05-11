@@ -26,6 +26,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 
+from aqp.persistence._tenancy_mixins import ProjectScopedMixin
 from aqp.persistence.models import Base
 
 
@@ -33,7 +34,7 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-class PipelineManifestRow(Base):
+class PipelineManifestRow(Base, ProjectScopedMixin):
     """Persisted :class:`aqp.data.engine.PipelineManifest`."""
 
     __tablename__ = "pipeline_manifests"
@@ -54,11 +55,19 @@ class PipelineManifestRow(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("namespace", "name", name="uq_pipeline_manifests_ns_name"),
+        # Manifest names are unique per (workspace, namespace) pair. This
+        # lets two workspaces both ship a ``daily_ohlcv`` manifest in
+        # the same namespace without colliding on the unique index.
+        # Pre-tenancy rows have ``workspace_id IS NULL`` and the legacy
+        # constraint name is preserved on the index for backward compat.
+        UniqueConstraint(
+            "workspace_id", "namespace", "name",
+            name="uq_pipeline_manifests_ws_ns_name",
+        ),
     )
 
 
-class PipelineRunRow(Base):
+class PipelineRunRow(Base, ProjectScopedMixin):
     """One execution of a :class:`PipelineManifestRow`."""
 
     __tablename__ = "pipeline_runs"
@@ -87,7 +96,7 @@ class PipelineRunRow(Base):
     duration_seconds = Column(Float, nullable=True)
 
 
-class DatasetProfile(Base):
+class DatasetProfile(Base, ProjectScopedMixin):
     """Cached column statistics for a dataset version."""
 
     __tablename__ = "dataset_profiles"
@@ -108,7 +117,7 @@ class DatasetProfile(Base):
     )
 
 
-class DatahubSyncLog(Base):
+class DatahubSyncLog(Base, ProjectScopedMixin):
     """One emit / pull cycle against DataHub."""
 
     __tablename__ = "datahub_sync_log"
@@ -125,7 +134,7 @@ class DatahubSyncLog(Base):
     finished_at = Column(DateTime, nullable=True)
 
 
-class FetcherRun(Base):
+class FetcherRun(Base, ProjectScopedMixin):
     """One invocation of a :class:`aqp.data.fetchers.Fetcher`.
 
     Useful for the ``/data/sources`` UI to display recent activity per

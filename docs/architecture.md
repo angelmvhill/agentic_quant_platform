@@ -143,7 +143,9 @@ RL training — only the worker's task module changes. See
 | --- | --- | --- |
 | [agents/](../aqp/agents/) | CrewAI agent definitions, prompts, tools | [agentic-pipeline.md](agentic-pipeline.md) |
 | [api/](../aqp/api/) | FastAPI app + 30 route modules | [webui.md](webui.md) (consumer) |
-| [backtest/](../aqp/backtest/) | Backtest engines (vectorbt, custom, replay) | [backtest-engines.md](backtest-engines.md) |
+| [backtest/](../aqp/backtest/) | Seven backtest engines behind a shared `BaseBacktestEngine` ABC: vbt-pro (primary), event-driven, OSS vectorbt, backtesting.py, ZVT, AAT, fallback cascade | [backtest-engines.md](backtest-engines.md) |
+| [backtest/vbtpro/](../aqp/backtest/vbtpro/) | Deep vectorbt-pro integration (signals/orders/optimizer/holding/random modes, WFO, Param sweeps, IndicatorFactory bridge) | [vbtpro-integration.md](vbtpro-integration.md) |
+| [bots/](../aqp/bots/) | Bot entity (TradingBot / ResearchBot) — smallest deployable unit; aggregates universe + strategy + engine + ML + agents + RAG + metrics. Drives backtest / paper / chat / k8s deploy via `BotRuntime`. | [bots.md](bots.md) |
 | [cli/](../aqp/cli/) | `aqp` CLI entry points | [providers.md](providers.md) |
 | [core/](../aqp/core/) | `Symbol`, enums, dataclasses, type contracts | [core-types.md](core-types.md) |
 | [data/](../aqp/data/) | Iceberg catalog, ingestion pipeline, indicator zoo | [data-catalog.md](data-catalog.md), [data-plane.md](data-plane.md) |
@@ -154,7 +156,7 @@ RL training — only the worker's task module changes. See
 | [persistence/](../aqp/persistence/) | SQLAlchemy ORM + LedgerWriter | [domain-model.md](domain-model.md), [erd.md](erd.md) |
 | [providers/](../aqp/providers/) | Data-feed adapters (yfinance, AV, IBKR, …) | [data-plane.md](data-plane.md) |
 | [risk/](../aqp/risk/) | Position-, daily-, drawdown-loss limits | [paper-trading.md](paper-trading.md) |
-| [rl/](../aqp/rl/) | gym envs + SB3 thin adapters (FinRL pattern) | [ml-framework.md](ml-framework.md) |
+| [rl/](../aqp/rl/) | Metaclass-driven RL stack: core abstractions + envs (FinRL ports + AQP) + composable rewards / observations / actions / terminations + multi-framework agents (SB3 / ElegantRL / RLlib / CleanRL / LLM-hybrid) + data pipelines + ensemblers + experiments + Iceberg trajectory store + `RLRuntime` | [rl-framework.md](rl-framework.md) |
 | [runtime/](../aqp/runtime/) | Control-plane state (provider overrides, kill switches) | [providers.md](providers.md) |
 | [services/](../aqp/services/) | Higher-level domain services (Alpha Vantage, etc.) | [alpha-vantage.md](alpha-vantage.md) |
 | [strategies/](../aqp/strategies/) | `BaseStrategy` + concrete alpha implementations | [factor-research.md](factor-research.md), [strategy-lifecycle.md](strategy-lifecycle.md) |
