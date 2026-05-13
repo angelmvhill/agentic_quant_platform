@@ -38,6 +38,15 @@ pnpm install
 pnpm dev
 ```
 
+### Docker helper
+
+```bash
+# from repo root
+python scripts/run_webui.py          # http://localhost:3000
+python scripts/run_webui.py --build  # rebuild before starting
+python scripts/run_webui.py --logs   # start and tail Docker logs
+```
+
 The app expects the FastAPI backend on `http://localhost:8000`. Override with
 `NEXT_PUBLIC_API_URL` in `webui/.env.local`.
 

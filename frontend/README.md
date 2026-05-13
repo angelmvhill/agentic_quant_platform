@@ -121,6 +121,15 @@ in `docker-compose.yml` for a one-command rollback
 docker compose up -d --build frontend   # http://localhost:3002
 ```
 
+Or use the repo helper:
+
+```bash
+# from repo root
+python scripts/run_frontend.py          # http://localhost:3002
+python scripts/run_frontend.py --build  # rebuild before starting
+python scripts/run_frontend.py --logs   # start and tail Docker logs
+```
+
 The compose-managed container is published on host **`:3002`** (not
 `:3001`) so it can coexist with the dagster-webserver in the
 visualization profile, which already binds host `:3001`. The

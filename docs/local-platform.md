@@ -22,6 +22,18 @@ services it depends on (Polaris, Trino, Dagster). Don't pass `--profile
 platform` alone — the AQP webui still depends on Superset from the
 viz overlay.
 
+## UI helper commands
+
+Use these from the repo root when you only need a browser UI:
+
+| Goal | Command | URL |
+| --- | --- | --- |
+| Start the legacy Next.js webui | `python scripts/run_webui.py` | `http://localhost:3000` |
+| Start the Vite frontend | `python scripts/run_frontend.py` | `http://localhost:3002` |
+
+Both helpers accept `--build` to rebuild before starting and `--logs`
+to tail the service logs after startup.
+
 ## Services added by the platform overlay
 
 | Service | Container | Default host port | Wires into |
