@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -180,7 +180,7 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 inspiration/
-data/
+/data/
 
 # Source directories under webui intentionally use these names.
 !webui/lib/
